@@ -1,0 +1,18 @@
+server:
+  port: 8000
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: demo
+          uri: lb://demo
+          predicates:
+            - Path=/demo/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowCredentials: true
+            allowedHeaders: '*'
+            allowedMethods: '*'
+            allowedOriginPatterns: '*'
+            maxAge: 3600
