@@ -9,7 +9,7 @@ spring:
           predicates:
             - Path=/demo/**
         - id: fourm
-          uri: http://localhost:7000
+          uri: lb://fourm
           predicates:
             - Path=/fourm/**
         - id: im-core

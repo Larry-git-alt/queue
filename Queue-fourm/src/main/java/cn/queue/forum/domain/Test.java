@@ -3,17 +3,16 @@ package cn.queue.forum.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 /**
  * @author 马兰友
- * @Date: 2024/05/18/16:03
+ * @Date: 2024/05/18/16:45
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Dynamic {
+public class Test {
 
-    private Long id;
+    private Integer id;
 
 }
