@@ -12,6 +12,10 @@ spring:
           uri: http://localhost:7000
           predicates:
             - Path=/fourm/**
+        - id: im-core
+          uri: http://localhost:9000
+          predicates:
+            - Path=/im-core/**
       globalcors:
         cors-configurations:
           '[/**]':
