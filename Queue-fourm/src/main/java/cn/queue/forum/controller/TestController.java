@@ -17,11 +17,16 @@ import java.util.List;
  * @Date: 2024/05/18/15:18
  */
 @LarryController
-@RequestMapping("/test")
+//@RequestMapping("/test")
 public class TestController {
 
     @Resource
     private TestMapper testMapper;
+
+    @GetMapping("/test")
+    public String test01 () {
+     return "hello word";
+    }
 
     @GetMapping
     public List<Test> test () {
