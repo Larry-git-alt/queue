@@ -9,8 +9,8 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>cn.queue.dynamic</groupId>
-    <artifactId>Queue-dynamic</artifactId>
+    <groupId>cn.queue.base</groupId>
+    <artifactId>Queue-base</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
