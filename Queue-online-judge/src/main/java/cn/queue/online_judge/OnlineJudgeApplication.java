@@ -16,5 +16,6 @@ public class OnlineJudgeApplication {
         Environment env = app.run(args).getEnvironment();
         LOG.info("{} 启动成功!!", env.getProperty("spring.application.name"));
         LOG.info("{} 地址:\thttp://127.0.0.1:{}", env.getProperty("spring.application.name"), env.getProperty("server.port"));
+        System.out.println("fkfsb");
     }
 }
