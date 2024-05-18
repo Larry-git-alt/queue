@@ -13,4 +13,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Dynamic {
+
+    private Long id;
+
 }
