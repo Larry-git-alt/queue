@@ -8,6 +8,10 @@ spring:
           uri: lb://demo
           predicates:
             - Path=/demo/**
+        - id: fourm
+          uri: lb://fourm
+          predicates:
+            - Path=/fourm/**
       globalcors:
         cors-configurations:
           '[/**]':

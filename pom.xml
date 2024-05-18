@@ -21,6 +21,7 @@
         <module>Queue-video</module>
         <module>Queue-fourm</module>
         <module>Queue-file</module>
+        <module>Queue-base</module>
     </modules>
 
     <properties>
