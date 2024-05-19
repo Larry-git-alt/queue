@@ -10,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public interface ImHandlerFactory {
 
+
     /**
      * 按照immsg的code去筛选
      *
@@ -17,5 +18,5 @@ public interface ImHandlerFactory {
      * @param imMsg
      */
     void doMsgHandler(ChannelHandlerContext channelHandlerContext, ImMsgEntity imMsg);
-
+    String test();
 }

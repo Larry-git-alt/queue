@@ -30,5 +30,15 @@ public class ImMsgEntity {
     private Integer code;
 
     private String fileType;
+    //测试数据
+//    {
+//        "id": 1,
+//            "userId": 11,
+//            "targetId": 22,
+//            "createTime": "2024-05-19T12:00:00",
+//            "content": "Hello, this is a test message.",
+//            "code": 1003,
+//            "fileType": "text"
+//    }
 
 }

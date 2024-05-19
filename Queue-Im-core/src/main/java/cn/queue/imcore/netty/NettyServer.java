@@ -1,6 +1,8 @@
 package cn.queue.imcore.netty;
 
 import cn.queue.imcore.encoder.WebsocketEncoder;
+import cn.queue.imcore.handler.WebSocketHandler;
+import cn.queue.imcore.handler.WsSharkHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -25,11 +27,7 @@ public class NettyServer {
     public NettyServer(int port) {
         this.port = port;
     }
-    public static void setApplicationContext(ConfigurableApplicationContext configurableApplicationContext) {
-
-    }
-
-    public  void start(int port) {
+    public void start(int port) {
         //配置服务端NIO线程组
         EventLoopGroup bossGroup = new NioEventLoopGroup(); //NioEventLoopGroup extends MultithreadEventLoopGroup Math.max(1, SystemPropertyUtil.getInt("io.netty.eventLoopThreads", NettyRuntime.availableProcessors() * 2));
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -51,8 +49,8 @@ public class NettyServer {
                     //http数据在传输过程中是分段 就是可以将多个段聚合 这就是为什么当浏览器发生大量数据时 就会发生多次http请求
                     ch.pipeline().addLast(new HttpObjectAggregator(8192));
                     ch.pipeline().addLast(new WebsocketEncoder());
-//                    ch.pipeline().addLast(new WsSharkHandler());
-//                    ch.pipeline().addLast(new WebSocketHandler());
+                    ch.pipeline().addLast(new WsSharkHandler());
+                    ch.pipeline().addLast(new WebSocketHandler());
 //                    ch.pipeline().addLast(
 //                            new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS),new NettyClientHandler()
 //                    );
