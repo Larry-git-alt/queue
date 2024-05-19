@@ -11,5 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 @Data
 @Builder
-public class User {
+public class UserEntity {
+    private Long userId;
+    private String username;
+    private String password;
+    private String avtar;
+    private Integer status;
 }

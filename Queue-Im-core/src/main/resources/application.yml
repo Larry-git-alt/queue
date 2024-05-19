@@ -13,7 +13,16 @@ spring:
       host: 127.0.0.1
       port: 6379
       database: 9
-
+mybatis-plus:
+  # 对应的 XML 文件位置
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  # 实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: cn.queue.**.domain
+  configuration:
+    cache-enabled: true
+    use-generated-keys: true
+    default-executor-type: simple
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 logging:
   level:
     cn:
