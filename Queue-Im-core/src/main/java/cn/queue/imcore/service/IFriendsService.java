@@ -1,7 +1,9 @@
-package cn.queue.imcore.service.impl;
+package cn.queue.imcore.service;
 
 import cn.queue.imcore.domain.entity.FriendsEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * @author: Larry
@@ -9,4 +11,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @Description:
  */
 public interface IFriendsService  {
+    List<FriendsEntity> getList(Long id);
 }

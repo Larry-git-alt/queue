@@ -1,4 +1,4 @@
-package cn.queue.imcore.repository;
+package cn.queue.imcore.dao;
 
 import cn.queue.imcore.domain.entity.FriendsEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

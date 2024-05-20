@@ -2,7 +2,10 @@ package cn.queue.imcore.service.impl;
 
 import cn.queue.common.util.RedisUtil;
 import cn.queue.imcore.domain.entity.FriendsEntity;
-import cn.queue.imcore.repository.IFriendsDao;
+import cn.queue.imcore.dao.IFriendsDao;
+import cn.queue.imcore.service.IFriendsService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +17,16 @@ import java.util.List;
  * @Description:
  */
 @Service
-public class FriendsServiceImpl {
+public class FriendsServiceImpl implements IFriendsService {
     @Resource
     private IFriendsDao friendsDao;
     @Resource
     private RedisUtil redisUtil;
 
-    public List<FriendsEntity> test(){
-        redisUtil.set("test",6);
-        return friendsDao.selectList(null);
+    public List<FriendsEntity> getList(Long id) {
+        LambdaQueryWrapper<FriendsEntity> friendsEntityLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        friendsEntityLambdaQueryWrapper.eq(id!=null,FriendsEntity::getFromId,id);
+        return friendsDao.selectList(friendsEntityLambdaQueryWrapper);
     }
 
 }

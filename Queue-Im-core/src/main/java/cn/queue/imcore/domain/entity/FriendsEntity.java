@@ -27,5 +27,6 @@ public class FriendsEntity {
   private Integer black;
   private Integer status;
   private LocalDateTime createTime;
+  private String photo;
   private String extra;
 }

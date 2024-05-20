@@ -1,5 +1,10 @@
 package cn.queue.imcore.domain.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.naming.ldap.PagedResultsControl;
 
 /**
@@ -7,6 +12,10 @@ import javax.naming.ldap.PagedResultsControl;
  * @Date: 2024 /05 /18 / 19:54
  * @Description:
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class GroupEntity {
    private Long id;
    //群主
