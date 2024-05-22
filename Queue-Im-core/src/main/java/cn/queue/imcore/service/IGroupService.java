@@ -1,8 +1,8 @@
 package cn.queue.imcore.service;
 
 import cn.queue.common.domain.entity.UserEntity;
+import cn.queue.domain.dto.GroupInviteDTO;
 import cn.queue.domain.entity.GroupEntity;
-
 
 import java.util.List;
 
@@ -20,4 +20,10 @@ public interface IGroupService {
      * @param group
      */
     void createGroup(GroupEntity group);
+
+    /**
+     * 邀请成员
+     * @param groupInviteDTO
+     */
+    void invite(GroupInviteDTO groupInviteDTO);
 }
