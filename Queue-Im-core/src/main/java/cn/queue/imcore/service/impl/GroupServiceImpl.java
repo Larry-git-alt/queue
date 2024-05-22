@@ -1,7 +1,8 @@
 package cn.queue.imcore.service.impl;
 
 import cn.queue.common.domain.entity.UserEntity;
-
+import cn.queue.common.exception.define.BizException;
+import cn.queue.domain.dto.GroupInviteDTO;
 import cn.queue.domain.entity.GroupEntity;
 import cn.queue.domain.entity.GroupMemberEntity;
 import cn.queue.domain.valueObj.GroupConstant;
@@ -68,6 +69,28 @@ public class GroupServiceImpl implements IGroupService {
                 .build();
         // 将群主的群成员信息插入到群成员表中
         groupUserDao.insert(groupMemberEntity);
+    }
+
+    /**
+     * 邀请成员
+     * @param groupInviteDTO
+     */
+    @Override
+    public void invite(GroupInviteDTO groupInviteDTO) {
+        Long inviter_id = 1L; // TODO 改为调用此接口的userId
+        if (groupInviteDTO.getUserIds().isEmpty()) {
+            throw new BizException(450, "邀请成员列表不可为空"); // TODO code后续改为枚举类的
+        }
+        // TODO 暂时为立即邀请成功，无审核
+        groupInviteDTO.getUserIds().forEach(userId -> {
+            GroupMemberEntity groupMemberEntity = GroupMemberEntity.builder()
+                    .groupId(groupInviteDTO.getGroupId())
+                    .memberId(userId)
+                    .status(GroupConstant.DEFAULT_MEMBER_STATUS)
+                    .role(GroupConstant.NORMAL_TYPE_CODE)
+                    .build();
+            groupUserDao.insert(groupMemberEntity);
+        });
     }
 
 }
