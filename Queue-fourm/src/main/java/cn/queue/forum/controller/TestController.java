@@ -2,7 +2,6 @@ package cn.queue.forum.controller;
 
 import cn.queue.common.annnotation.LarryController;
 import cn.queue.forum.domain.dto.DynamicDTO;
-import cn.queue.forum.domain.entity.Test;
 import cn.queue.forum.mapper.DynamicMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
