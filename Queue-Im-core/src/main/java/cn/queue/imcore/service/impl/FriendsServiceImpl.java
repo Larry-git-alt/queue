@@ -1,7 +1,7 @@
 package cn.queue.imcore.service.impl;
 
 import cn.queue.common.util.RedisUtil;
-import cn.queue.imcore.domain.entity.FriendsEntity;
+import cn.queue.domain.entity.FriendsEntity;
 import cn.queue.imcore.dao.IFriendsDao;
 import cn.queue.imcore.service.IFriendsService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

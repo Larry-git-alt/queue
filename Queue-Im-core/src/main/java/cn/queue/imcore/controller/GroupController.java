@@ -1,6 +1,7 @@
 package cn.queue.imcore.controller;
 
-import cn.queue.imcore.domain.entity.GroupEntity;
+
+import cn.queue.domain.entity.GroupEntity;
 import cn.queue.imcore.service.IGroupService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;

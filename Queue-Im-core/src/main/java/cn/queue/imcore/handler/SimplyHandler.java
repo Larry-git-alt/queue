@@ -1,7 +1,5 @@
 package cn.queue.imcore.handler;
-
-
-import cn.queue.imcore.domain.entity.ImMsgEntity;
+import cn.queue.domain.entity.ImMsgEntity;
 import io.netty.channel.ChannelHandlerContext;
 
 

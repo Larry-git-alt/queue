@@ -1,7 +1,8 @@
 package cn.queue.imcore.controller;
 
 import cn.queue.common.annnotation.LarryController;
-import cn.queue.imcore.domain.entity.FriendsEntity;
+
+import cn.queue.domain.entity.FriendsEntity;
 import cn.queue.imcore.service.impl.FriendsServiceImpl;
 import jakarta.annotation.Generated;
 import jakarta.annotation.Resource;

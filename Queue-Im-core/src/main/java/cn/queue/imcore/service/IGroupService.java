@@ -1,7 +1,8 @@
 package cn.queue.imcore.service;
 
 import cn.queue.common.domain.entity.UserEntity;
-import cn.queue.imcore.domain.entity.GroupEntity;
+import cn.queue.domain.entity.GroupEntity;
+
 
 import java.util.List;
 

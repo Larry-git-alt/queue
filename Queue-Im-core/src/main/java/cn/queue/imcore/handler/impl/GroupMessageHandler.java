@@ -1,7 +1,6 @@
 package cn.queue.imcore.handler.impl;
-
-import cn.queue.imcore.cache.ChannelHandlerContextCache;
-import cn.queue.imcore.domain.entity.ImMsgEntity;
+import cn.queue.cache.ChannelHandlerContextCache;
+import cn.queue.domain.entity.ImMsgEntity;
 import cn.queue.imcore.handler.SimplyHandler;
 import cn.queue.imcore.service.IGroupService;
 import io.netty.channel.ChannelHandlerContext;

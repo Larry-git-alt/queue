@@ -1,7 +1,6 @@
 package cn.queue.imcore.handler;
-
-import cn.queue.imcore.cache.ChannelHandlerContextCache;
-import cn.queue.imcore.util.ImContextUtils;
+import cn.queue.cache.ChannelHandlerContextCache;
+import cn.queue.util.ImContextUtils;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

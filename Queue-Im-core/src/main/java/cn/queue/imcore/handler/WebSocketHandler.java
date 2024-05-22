@@ -1,5 +1,5 @@
 package cn.queue.imcore.handler;
-import cn.queue.imcore.domain.entity.ImMsgEntity;
+import cn.queue.domain.entity.ImMsgEntity;
 import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;

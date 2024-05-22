@@ -1,6 +1,6 @@
 package cn.queue.imcore.handler.impl;
-import cn.queue.imcore.valueObj.ImMsgCodeEnum;
-import cn.queue.imcore.domain.entity.ImMsgEntity;
+import cn.queue.domain.entity.ImMsgEntity;
+import cn.queue.domain.valueObj.ImMsgCodeEnum;
 import cn.queue.imcore.handler.ImHandlerFactory;
 import cn.queue.imcore.handler.SimplyHandler;
 import io.netty.channel.ChannelHandlerContext;

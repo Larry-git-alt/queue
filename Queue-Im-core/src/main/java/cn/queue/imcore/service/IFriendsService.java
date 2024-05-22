@@ -1,6 +1,7 @@
 package cn.queue.imcore.service;
 
-import cn.queue.imcore.domain.entity.FriendsEntity;
+
+import cn.queue.domain.entity.FriendsEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;

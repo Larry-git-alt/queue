@@ -1,6 +1,5 @@
 package cn.queue.imcore.dao;
-
-import cn.queue.imcore.domain.entity.GroupEntity;
+import cn.queue.domain.entity.GroupEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

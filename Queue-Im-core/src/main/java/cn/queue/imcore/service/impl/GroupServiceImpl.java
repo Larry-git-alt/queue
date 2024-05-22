@@ -1,11 +1,12 @@
 package cn.queue.imcore.service.impl;
 
 import cn.queue.common.domain.entity.UserEntity;
-import cn.queue.imcore.constant.GroupConstant;
+
+import cn.queue.domain.entity.GroupEntity;
+import cn.queue.domain.entity.GroupMemberEntity;
+import cn.queue.domain.valueObj.GroupConstant;
 import cn.queue.imcore.dao.IGroupDao;
 import cn.queue.imcore.dao.IGroupUserDao;
-import cn.queue.imcore.domain.entity.GroupEntity;
-import cn.queue.imcore.domain.entity.GroupMemberEntity;
 import cn.queue.imcore.service.IGroupService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;

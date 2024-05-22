@@ -1,7 +1,6 @@
 package cn.queue.imcore.repository;
-
-import cn.queue.imcore.domain.entity.FriendsEntity;
-import cn.queue.imcore.domain.entity.GroupEntity;
+import cn.queue.domain.entity.FriendsEntity;
+import cn.queue.domain.entity.GroupEntity;
 import cn.queue.imcore.service.IFriendsService;
 import cn.queue.imcore.service.IGroupService;
 import cn.queue.imcore.vo.SessionVO;
