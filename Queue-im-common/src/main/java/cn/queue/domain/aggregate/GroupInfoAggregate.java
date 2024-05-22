@@ -1,6 +1,6 @@
 package cn.queue.domain.aggregate;
-import cn.queue.imcore.domain.dto.MemberDTO;
-import cn.queue.imcore.domain.entity.GroupEntity;
+import cn.queue.domain.dto.MemberDTO;
+import cn.queue.domain.entity.GroupEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

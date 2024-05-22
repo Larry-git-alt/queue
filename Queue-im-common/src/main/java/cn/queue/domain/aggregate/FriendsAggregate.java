@@ -1,6 +1,7 @@
 package cn.queue.domain.aggregate;
 
-import cn.queue.imcore.domain.dto.FriendDTO;
+
+import cn.queue.domain.dto.FriendDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
