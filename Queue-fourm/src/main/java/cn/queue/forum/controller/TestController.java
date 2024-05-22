@@ -1,14 +1,13 @@
 package cn.queue.forum.controller;
 
 import cn.queue.common.annnotation.LarryController;
-import cn.queue.common.exception.define.BizException;
-import cn.queue.forum.domain.Test;
-import cn.queue.forum.mapper.TestMapper;
+import cn.queue.forum.domain.dto.DynamicDTO;
+import cn.queue.forum.domain.entity.Test;
+import cn.queue.forum.mapper.DynamicMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,19 +16,20 @@ import java.util.List;
  * @Date: 2024/05/18/15:18
  */
 @LarryController
-//@RequestMapping("/test")
+
 public class TestController {
 
     @Resource
-    private TestMapper testMapper;
+    private StringRedisTemplate stringRedisTemplate;
 
     @GetMapping("/test")
-    public String test01 () {
-     return "hello word";
+    public DynamicDTO test01 () {
+        stringRedisTemplate.opsForSet().add("test", "test");
+     return new DynamicDTO();
     }
 
-    @GetMapping
-    public List<Test> test () {
-        return testMapper.selectList(new LambdaQueryWrapper<>());
-    }
+
+
+
+
 }
