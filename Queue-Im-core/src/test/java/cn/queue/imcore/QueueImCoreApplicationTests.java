@@ -1,7 +1,6 @@
 package cn.queue.imcore;
-
-import cn.queue.imcore.domain.event.BaseEvent;
-import publisher.EventPublisher;
+import cn.queue.domain.event.BaseEvent;
+import cn.queue.imcore.publisher.EventPublisher;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

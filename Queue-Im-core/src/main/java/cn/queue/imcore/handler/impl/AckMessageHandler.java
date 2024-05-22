@@ -1,6 +1,7 @@
 package cn.queue.imcore.handler.impl;
 import cn.queue.common.util.SnowUtil;
 import cn.queue.domain.entity.ImMsgEntity;
+import cn.queue.domain.event.BaseEvent;
 import cn.queue.imcore.handler.SimplyHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.data.mapping.Association;
@@ -15,7 +16,7 @@ import org.springframework.data.mapping.SimpleAssociationHandler;
 public class AckMessageHandler implements SimplyHandler {
     @Override
     public void handler(ChannelHandlerContext ctx, ImMsgEntity imMsg) {
-         imMsg.setId(SnowUtil.getSnowflakeNextId());
-         
+
+
     }
 }

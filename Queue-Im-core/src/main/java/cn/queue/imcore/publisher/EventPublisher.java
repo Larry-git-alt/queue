@@ -1,5 +1,5 @@
-package publisher;
-import cn.queue.imcore.domain.event.BaseEvent;
+package cn.queue.imcore.publisher;
+import cn.queue.domain.event.BaseEvent;
 import com.alibaba.fastjson.JSON;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
