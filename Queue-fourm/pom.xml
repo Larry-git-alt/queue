@@ -35,11 +35,14 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>cn.queue</groupId>
 			<artifactId>Queue-common</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+
+
 
 	</dependencies>
 
