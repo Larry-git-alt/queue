@@ -9,4 +9,4 @@ spring:
   profiles:
     active: dev
   application:
-    name: online_judge
+    name: judge

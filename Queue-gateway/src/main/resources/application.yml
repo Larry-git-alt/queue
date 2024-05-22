@@ -12,6 +12,10 @@ spring:
           uri: lb://fourm
           predicates:
             - Path=/fourm/**
+        - id: judge
+          uri: lb://judge
+          predicates:
+            - Path=/judge/**
       globalcors:
         cors-configurations:
           '[/**]':
