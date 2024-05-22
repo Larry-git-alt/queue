@@ -30,6 +30,7 @@ public class GroupServiceImpl implements IGroupService {
    @Resource
    private IGroupUserDao groupUserDao;
 
+   @Override
    public List<GroupEntity> getGroupList(Long userId){
        LambdaQueryWrapper<GroupMemberEntity> groupMemberEntityLambdaQueryWrapper = new LambdaQueryWrapper<>();
        groupMemberEntityLambdaQueryWrapper.eq(userId!=null,GroupMemberEntity::getMemberId,userId);
