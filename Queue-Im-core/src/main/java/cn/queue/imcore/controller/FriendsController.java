@@ -21,7 +21,8 @@ public class FriendsController {
 
     @GetMapping("/get")
     public List<FriendsEntity> test(){
-        return friendsService.test();
+        //return friendsService.test();
+        return null;
     }
 
 }
