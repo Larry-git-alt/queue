@@ -19,9 +19,10 @@ public class FriendsController {
     @Resource
     private FriendsServiceImpl friendsService;
 
-//    @GetMapping("/get")
-//    public List<FriendsEntity> test(){
-//        return friendsService.test();
-//    }
+    @GetMapping("/get")
+    public List<FriendsEntity> test(){
+        //return friendsService.test();
+        return null;
+    }
 
 }

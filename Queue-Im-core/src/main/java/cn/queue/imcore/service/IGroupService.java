@@ -13,4 +13,10 @@ import java.util.List;
 public interface IGroupService {
     List<GroupEntity> getGroupList(Long userId);
     List<UserEntity> getUserByGroupId(Long groupId);
+
+    /**
+     * 创建群聊
+     * @param group
+     */
+    void createGroup(GroupEntity group);
 }
