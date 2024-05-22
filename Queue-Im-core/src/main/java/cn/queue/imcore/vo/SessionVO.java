@@ -18,4 +18,5 @@ public class SessionVO {
     private Long id;
     private String name;
     private String photo;
+    private String type;
 }

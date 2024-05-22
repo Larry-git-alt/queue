@@ -1,4 +1,4 @@
-package cn.queue.imcore.constant;
+package cn.queue.imcore.valueObj;
 
 /**
  * @Author idea
@@ -13,7 +13,6 @@ public enum ImMsgCodeEnum {
     IM_HEARTBEAT_MSG(1004,"im服务器心跳消息包"),
     IM_ACK_MSG(1005,"im服务的ack消息包"),
     IM_GROUP_MSG (1007,"群聊消息包");
-
     private int code;
     private String desc;
 

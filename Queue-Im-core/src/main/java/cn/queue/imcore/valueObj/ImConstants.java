@@ -1,4 +1,4 @@
-package cn.queue.imcore.constant;
+package cn.queue.imcore.valueObj;
 
 /**
  * @Author idea

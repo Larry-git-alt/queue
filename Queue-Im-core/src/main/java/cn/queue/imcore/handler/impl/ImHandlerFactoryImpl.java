@@ -1,5 +1,5 @@
 package cn.queue.imcore.handler.impl;
-import cn.queue.imcore.constant.ImMsgCodeEnum;
+import cn.queue.imcore.valueObj.ImMsgCodeEnum;
 import cn.queue.imcore.domain.entity.ImMsgEntity;
 import cn.queue.imcore.handler.ImHandlerFactory;
 import cn.queue.imcore.handler.SimplyHandler;

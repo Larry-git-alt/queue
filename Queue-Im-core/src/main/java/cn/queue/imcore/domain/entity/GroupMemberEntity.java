@@ -18,6 +18,7 @@ public class GroupMemberEntity {
     private Long id;
     private Long groupId;
     private Long memberId;
+    // 0 成员 1管理员 2群主
     private String role;
     //是否处于禁用
     private Integer status;

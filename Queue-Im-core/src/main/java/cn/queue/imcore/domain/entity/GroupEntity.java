@@ -18,7 +18,7 @@ import javax.naming.ldap.PagedResultsControl;
 @Builder
 public class GroupEntity {
    private Long id;
-   //群主
+   //群名
    private String groupName;
    //群主
    private String ownerId;
