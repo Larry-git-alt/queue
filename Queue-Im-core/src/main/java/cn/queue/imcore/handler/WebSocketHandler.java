@@ -1,4 +1,7 @@
 package cn.queue.imcore.handler;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import cn.queue.cache.ChannelHandlerContextCache;
 import cn.queue.domain.entity.ImMsgEntity;
 import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.Bootstrap;
@@ -67,21 +70,16 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof HttpRequest) {
-            HttpRequest httpRequest = (HttpRequest) msg;
-            // 处理 HTTP 请求
+        if (msg instanceof HttpRequest httpRequest) {// 处理 HTTP 请求
             System.out.println("Received HTTP request: " + httpRequest.method() + " " + httpRequest.uri());
             // 如果需要，可以在这里处理 WebSocket 握手逻辑
-        } else if (msg instanceof WebSocketFrame) {
-            WebSocketFrame webSocketFrame = (WebSocketFrame) msg;
+        } else if (msg instanceof WebSocketFrame webSocketFrame) {
             // 处理 WebSocket 消息
-            if (webSocketFrame instanceof TextWebSocketFrame) {
-                TextWebSocketFrame frame = (TextWebSocketFrame) webSocketFrame;
-                System.out.println(frame.text());
+            if (webSocketFrame instanceof TextWebSocketFrame frame) {
                 ImMsgEntity imMsgEntity = JSON.parseObject(frame.text(), ImMsgEntity.class);
                 webSocketHandler.imHandlerFactory.doMsgHandler(ctx,imMsgEntity);
-            } else if (webSocketFrame instanceof BinaryWebSocketFrame) {
-                BinaryWebSocketFrame binaryWebSocketFrame = (BinaryWebSocketFrame) webSocketFrame;
+
+            } else if (webSocketFrame instanceof BinaryWebSocketFrame binaryWebSocketFrame) {
                 ByteBuf byteBuf = binaryWebSocketFrame.content();
                 // 处理二进制 WebSocket 消息
                 // 注意：在处理二进制消息时，需要根据实际情况解码消息内容
@@ -94,7 +92,14 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame) throws Exception {
 
     }
-
+        public static void sendMessageToUser(Long userId, String message) {
+        ChannelHandlerContext ctx = ChannelHandlerContextCache.get(userId);
+        if (ctx != null && ctx.channel().isActive()) {
+            ctx.writeAndFlush(new TextWebSocketFrame(message));
+        } else {
+            System.out.println("User " + userId + " is not connected or channel is not active.");
+        }
+    }
     private static Integer getUrlParams(String url) {
         if (!url.contains("=")) {
             return null;

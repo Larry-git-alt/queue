@@ -3,6 +3,8 @@ package cn.queue.consumer;
 import cn.queue.config.RocketMQConsumerProperties;
 import cn.queue.domain.entity.ImMsgEntity;
 import cn.queue.domain.valueObj.TopicConstant;
+import cn.queue.imcore.dao.IMessageDao;
+import cn.queue.imcore.service.IMessageService;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * @Author idea
@@ -20,22 +23,25 @@ import org.springframework.context.annotation.Configuration;
  * @Description
  */
 @Configuration
-public class ImAckConsumer implements InitializingBean {
+public class MessageAddConsumer implements InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImAckConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageAddConsumer.class);
 
     @Resource
     private RocketMQConsumerProperties rocketMQConsumerProperties;
+    @Resource
+    private IMessageService messageService;
+    @Resource
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        System.err.println(rocketMQConsumerProperties.getNameServer());
         DefaultMQPushConsumer mqPushConsumer = new DefaultMQPushConsumer();
         mqPushConsumer.setVipChannelEnabled(false);
         //设置我们的namesrv地址
         mqPushConsumer.setNamesrvAddr(rocketMQConsumerProperties.getNameServer());
         //声明消费组
-        mqPushConsumer.setConsumerGroup(rocketMQConsumerProperties.getGroup() + "_" + ImAckConsumer.class.getSimpleName());
+        mqPushConsumer.setConsumerGroup(rocketMQConsumerProperties.getGroup() + "_" + MessageAddConsumer.class.getSimpleName());
         //每次只拉取一条消息
         mqPushConsumer.setConsumeMessageBatchMaxSize(1);
         mqPushConsumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
@@ -43,8 +49,8 @@ public class ImAckConsumer implements InitializingBean {
         mqPushConsumer.setMessageListener((MessageListenerConcurrently) (msgs, context) -> {
             String json = new String(msgs.get(0).getBody());
             ImMsgEntity imMsgBody = JSON.parseObject(json, ImMsgEntity.class);
-            System.out.println(imMsgBody);
-//            int retryTimes = msgAckCheckService.getMsgAckTimes(imMsgBody.getMsgId(), imMsgBody.getUserId(), imMsgBody.getAppId());
+            messageService.addMessage(imMsgBody);
+//            int retryTimes = msgAckCheckService.getMsgAckTimes(imMsgBody.getMsgId(), imMsgBody.getUserId());
 //            LOGGER.info("retryTimes is {},msgId is {}", retryTimes, imMsgBody.getMsgId());
 //            if (retryTimes < 0) {
 //                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;

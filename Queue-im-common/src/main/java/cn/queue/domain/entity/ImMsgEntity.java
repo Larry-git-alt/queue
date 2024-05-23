@@ -1,10 +1,10 @@
 package cn.queue.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 /**
@@ -16,29 +16,33 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Data
-public class ImMsgEntity {
+@TableName("message")
+public class ImMsgEntity{
     private Long id;
 
     private Long userId;
 
     private Long targetId;
 
-    private LocalDateTime createTime;
+    private String createTime;
 
     private String content;
 
     private Integer code;
 
     private String fileType;
-    //测试数据
+//     "isRead":0
+    //0表示未读 1表示已读
+//    private Integer isRead;
+//    //测试数据
 //    {
-//        "id": 1,
-//            "userId": 11,
+//           "id":1,
+//            "userId": 33
 //            "targetId": 22,
 //            "createTime": "2024-05-19T12:00:00",
 //            "content": "Hello, this is a test message.",
 //            "code": 1003,
-//            "fileType": "text"
+//            "fileType": "text",
 //    }
 
 }

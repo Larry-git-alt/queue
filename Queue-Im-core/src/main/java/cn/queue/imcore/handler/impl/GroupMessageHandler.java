@@ -1,5 +1,6 @@
 package cn.queue.imcore.handler.impl;
 import cn.queue.cache.ChannelHandlerContextCache;
+import cn.queue.common.domain.entity.UserEntity;
 import cn.queue.domain.entity.ImMsgEntity;
 import cn.queue.imcore.handler.SimplyHandler;
 import cn.queue.imcore.service.IGroupService;
@@ -7,6 +8,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 /**
@@ -21,6 +24,13 @@ public class GroupMessageHandler implements SimplyHandler {
     @Override
     public void handler(ChannelHandlerContext ctx, ImMsgEntity imMsg) {
         Long groupId = imMsg.getTargetId();
+        List<UserEntity> userByGroupId = groupService.getUserByGroupId(groupId);
+        userByGroupId.forEach(
+                userEntity -> {
+                    sendMessageToUser(userEntity.getUserId(), imMsg.getContent());
+                }
+                //异步存储
+        );
 
 
     }

@@ -34,11 +34,11 @@ public class SessionRepository {
        return sessionVOS;
    }
 
-    private  void transformSession(Long groupEntity, String groupEntity1, String groupEntity2, List<SessionVO> sessionVOS) {
+    private void transformSession(Long id, String name, String photo, List<SessionVO> sessionVOS) {
         SessionVO sessionVO = SessionVO.builder()
-                .id(groupEntity)
-                .name(groupEntity1)
-                .photo(groupEntity2)
+                .id(id)
+                .name(name)
+                .photo(photo)
                 .build();
         sessionVOS.add(sessionVO);
     }

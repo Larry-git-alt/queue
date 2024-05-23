@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * @author: Larry
  * @Date: 2024 /05 /20 / 10:11
@@ -19,4 +21,5 @@ public class SessionVO {
     private String name;
     private String photo;
     private String type;
+    private LocalDateTime lastTime;
 }

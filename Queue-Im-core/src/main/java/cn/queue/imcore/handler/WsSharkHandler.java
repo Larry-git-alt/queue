@@ -26,9 +26,7 @@ public class WsSharkHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(WsSharkHandler.class);
 
     //指定监听的端口
-
     private int port = 1010;
-
     private String serverIp = "8088";
     private WebSocketServerHandshaker webSocketServerHandshaker;
     private static Logger logger = LoggerFactory.getLogger(WsSharkHandler.class);
@@ -74,7 +72,6 @@ public class WsSharkHandler extends ChannelInboundHandlerAdapter {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
             return;
         }
-
         ChannelFuture channelFuture = webSocketServerHandshaker.handshake(ctx.channel(), msg);
 
     }
