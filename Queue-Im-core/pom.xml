@@ -67,6 +67,11 @@
 			<artifactId>Queue-common</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>cn.queue.base</groupId>
+			<artifactId>Queue-base</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 </project>
