@@ -25,6 +25,8 @@ public class AddRecordDTO {
     private Integer status;
 
     private String photo;
+    //判断是申请的还是被申请的 1 是申请 0 是被申请
+    private Integer type;
 
     private LocalDateTime createTime;
 

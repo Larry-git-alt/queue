@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserFeign {
 
     @GetMapping("base/user/getById")
-    public User getById (@RequestParam("id") Long id);
+    User getById (@RequestParam("id") Long id);
 
 }
