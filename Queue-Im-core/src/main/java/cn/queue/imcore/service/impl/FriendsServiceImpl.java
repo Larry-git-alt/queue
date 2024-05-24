@@ -1,24 +1,28 @@
 package cn.queue.imcore.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.queue.base.user.domain.entity.User;
 import cn.queue.common.util.RedisUtil;
 import cn.queue.domain.dto.AddRecordDTO;
 import cn.queue.domain.entity.AddRecordEntity;
 import cn.queue.domain.entity.FriendsEntity;
+import cn.queue.imcore.cache.AddListCache;
 import cn.queue.imcore.dao.IApplyDao;
 import cn.queue.imcore.dao.IFriendsDao;
 import cn.queue.imcore.feign.UserFeign;
 import cn.queue.imcore.service.IFriendsService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,6 +41,10 @@ public class FriendsServiceImpl implements IFriendsService {
     private UserFeign userFeign;
     @Resource
     private IApplyDao applyDao;
+    @Resource
+    private AddListCache addListCache;
+    @Resource
+    private RedisTemplate<String, AddRecordDTO> redisTemplate;
 
     @Override
     public List<FriendsEntity> getList(Long id) {
@@ -73,8 +81,13 @@ public class FriendsServiceImpl implements IFriendsService {
         //判断是否已经申请过了
         LambdaQueryWrapper<AddRecordEntity> addQuery = new LambdaQueryWrapper<>();
         addQuery.eq(AddRecordEntity::getFromId, fromId).eq(AddRecordEntity::getToId, toId);
-        if (applyDao.exists(addQuery)) {
+        AddRecordEntity recordEntity = applyDao.selectOne(addQuery);
+        if (recordEntity != null && recordEntity.getStatus() == 1) {
             return "已经申请过了，等待验证中";
+        }else if(recordEntity != null && (recordEntity.getStatus() == 3 || recordEntity.getStatus() == 4)){
+            recordEntity.setStatus(1);
+            applyDao.updateById(recordEntity);
+            return "申请已发送";
         }
 
         AddRecordEntity addRecordEntity = AddRecordEntity.builder()
@@ -82,9 +95,20 @@ public class FriendsServiceImpl implements IFriendsService {
                 .toId(toId)
                 .status(1)
                 .note(note)
-                .createTime(LocalDateTime.now())
+                .createTime(new Date())
                 .build();
         applyDao.insert(addRecordEntity);
+        AddRecordDTO addRecordDTO = new AddRecordDTO();
+        BeanUtil.copyProperties(addRecordEntity, addRecordDTO);
+        addRecordDTO.setUsername(toUser.getUsername());
+        addRecordDTO.setPhoto(toUser.getImg());
+        addRecordDTO.setType(0);
+        addListCache.addToApplyList(addRecordDTO, toId);
+        User fromUser = userFeign.getById(fromId);
+        addRecordDTO.setUsername(fromUser.getUsername());
+        addRecordDTO.setPhoto(fromUser.getImg());
+        addRecordDTO.setType(1);
+        addListCache.addToApplyList(addRecordDTO, fromId);
 
         return "好友申请发送成功";
     }
@@ -116,7 +140,7 @@ public class FriendsServiceImpl implements IFriendsService {
         }
 
         addRecordEntity.setStatus(status);
-        addRecordEntity.setUpdateTime(LocalDateTime.now());
+        addRecordEntity.setUpdateTime(new Date());
         applyDao.update(addRecordEntity, addQuery);
 
         if (status == 1) {
@@ -146,7 +170,7 @@ public class FriendsServiceImpl implements IFriendsService {
                     .toId(toId)
                     .status(1)
                     .black(1)
-                    .createTime(LocalDateTime.now())
+                    .createTime(new Date())
                     .build();
             friendsDao.insert(friendsEntity);
 
@@ -155,7 +179,7 @@ public class FriendsServiceImpl implements IFriendsService {
                     .toId(fromId)
                     .status(1)
                     .black(1)
-                    .createTime(LocalDateTime.now())
+                    .createTime(new Date())
                     .build();
             friendsDao.insert(friendsEntity);
         }
@@ -166,9 +190,11 @@ public class FriendsServiceImpl implements IFriendsService {
         AddRecordEntity opAddRecordEntity = applyDao.selectOne(opAddQuery);
         if (opAddRecordEntity != null && opAddRecordEntity.getStatus() == 1) {
             opAddRecordEntity.setStatus(4);
-            opAddRecordEntity.setUpdateTime(LocalDateTime.now());
+            opAddRecordEntity.setUpdateTime(new Date());
             applyDao.update(opAddRecordEntity, opAddQuery);
         }
+        redisTemplate.delete("queue:im:addFriendsApply:" + fromId);
+        redisTemplate.delete("queue:im:addFriendsApply:" + toId);
 
         return "处理成功";
     }
@@ -228,6 +254,15 @@ public class FriendsServiceImpl implements IFriendsService {
             return null;
         }
 
+        log.info("查询申请列表");
+        RedisOperations<String, AddRecordDTO> operations = redisTemplate.opsForList().getOperations();
+        List<AddRecordDTO> range = redisTemplate.opsForList().range("queue:im:addFriendsApply:" + id, 0, -1);
+        //assert range != null;
+        if ( !range.isEmpty()){
+            return range;
+        }
+
+        log.info("没有缓存，查询数据库");
         //两种，一种是被申请，一种是申请
         LambdaQueryWrapper<AddRecordEntity> toQueryWrapper = new LambdaQueryWrapper<>();
         toQueryWrapper.eq(AddRecordEntity::getToId, id);
@@ -239,9 +274,12 @@ public class FriendsServiceImpl implements IFriendsService {
             BeanUtil.copyProperties(addRecordEntity, addRecordDTO);
             User fromUser = userFeign.getById(addRecordEntity.getFromId());
             addRecordDTO.setPhoto(fromUser.getImg());
-            addRecordDTO.setUpdateTime(LocalDateTime.now());
+            addRecordDTO.setUpdateTime(new Date());
             addRecordDTO.setType(0);
+            addRecordDTO.setUsername(fromUser.getUsername());
             addRecordDTOS.add(addRecordDTO);
+            //放入redis缓存
+            addListCache.addToApplyList(addRecordDTO, id);
         });
 
         LambdaQueryWrapper<AddRecordEntity> queryWrapper = new LambdaQueryWrapper<AddRecordEntity>()
@@ -251,11 +289,14 @@ public class FriendsServiceImpl implements IFriendsService {
             BeanUtil.copyProperties(addRecordEntity, addRecordDTO);
             User toUser = userFeign.getById(addRecordEntity.getToId());
             addRecordDTO.setPhoto(toUser.getImg());
-            addRecordDTO.setUpdateTime(LocalDateTime.now());
+            addRecordDTO.setUpdateTime(new Date());
             addRecordDTO.setType(1);
+            addRecordDTO.setUsername(toUser.getUsername());
             addRecordDTOS.add(addRecordDTO);
+            //放入redis缓存
+            addListCache.addToApplyList(addRecordDTO, id);
         });
-
+        //addListCache.addToApplyList(addRecordDTOS, id);
         return addRecordDTOS;
     }
 

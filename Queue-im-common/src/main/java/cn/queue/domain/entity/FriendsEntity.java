@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author: Larry
@@ -26,7 +27,7 @@ public class FriendsEntity {
   private String remark;
   private Integer black;
   private Integer status;
-  private LocalDateTime createTime;
+  private Date createTime;
   private String photo;
   private String extra;
 }
