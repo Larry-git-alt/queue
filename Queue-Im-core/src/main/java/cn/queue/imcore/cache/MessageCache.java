@@ -48,7 +48,8 @@ public class MessageCache {
             String mark = Math.max(getMessageDTO.getUserId(), getMessageDTO.getTargetId())+ "and" + Math.min(getMessageDTO.getUserId(),getMessageDTO.getTargetId());
             baseKey = CacheConstant.MESSAGE_USR_CACHE + "||"+mark;
         } else {
-            return new ArrayList<>(); // 或者抛出异常，取决于业务逻辑
+            // 或者抛出异常，取决于业务逻辑
+            return new ArrayList<>();
         }
         // 确保这里有获取RedisTemplate的方法
          return redisTemplate.opsForList().range(baseKey,0,50);
