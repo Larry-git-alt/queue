@@ -26,13 +26,9 @@ public class GroupMessageHandler implements SimplyHandler {
         Long groupId = imMsg.getTargetId();
         List<UserEntity> userByGroupId = groupService.getUserByGroupId(groupId);
         userByGroupId.forEach(
-                userEntity -> {
-                    sendMessageToUser(userEntity.getUserId(), imMsg.getContent());
-                }
+                userEntity -> sendMessageToUser(userEntity.getUserId(), imMsg.getContent())
                 //异步存储
         );
-
-
     }
     public static void sendMessageToUser(Long userId, String message) {
         ChannelHandlerContext ctx = ChannelHandlerContextCache.get(userId);

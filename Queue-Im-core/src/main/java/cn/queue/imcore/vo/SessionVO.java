@@ -20,6 +20,10 @@ public class SessionVO {
     private Long id;
     private String name;
     private String photo;
+    //私聊、群聊
     private String type;
-    private LocalDateTime lastTime;
+    //是否在线（私聊）
+    private Integer isOnline;
+    private String LastMessageContent;
+    private String LastTime;
 }

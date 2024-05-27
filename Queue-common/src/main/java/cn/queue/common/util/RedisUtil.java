@@ -35,6 +35,15 @@ public class RedisUtil {
     //    public RedisUtil(RedisTemplate<String, Object> redisTemplate) {
 //        this.redisTemplate = redisTemplate;
 //    }
+    public RedisUtil(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+    public void addZet(Long userId, String redisKey) {
+        redisTemplate.opsForZSet().add(redisKey, userId, System.currentTimeMillis());
+    }
+    public void removeExpireRecord(String redisKey,Integer time) {
+        redisTemplate.opsForZSet().removeRangeByScore(redisKey, 0, System.currentTimeMillis() - time * 1000 * 2);
+    }
     /**
      * 向zset里存入数据
      *

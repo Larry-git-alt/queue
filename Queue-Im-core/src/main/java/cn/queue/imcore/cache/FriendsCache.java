@@ -24,6 +24,6 @@ public class FriendsCache {
     public List<FriendsEntity> getFriends(Long userId){
         String key = CacheConstant.FRIENDS_LIST_CACHE+userId;
         //最多只能加500个好友
-        return redisTemplate.opsForList().range(key,0,50);
+        return redisTemplate.opsForList().range(key,0,500);
     }
 }

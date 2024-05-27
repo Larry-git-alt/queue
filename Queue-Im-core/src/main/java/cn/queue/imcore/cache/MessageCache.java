@@ -52,6 +52,27 @@ public class MessageCache {
             return new ArrayList<>();
         }
         // 确保这里有获取RedisTemplate的方法
-         return redisTemplate.opsForList().range(baseKey,0,50);
+        return redisTemplate.opsForList().range(baseKey,0,50);
+    }
+    //获得会话中最后一条消息
+    public ImMsgEntity getLastMessage(GetMessageDTO getMessageDTO){
+        String baseKey = null;
+        if(getMessageDTO.getCode() == ImMsgCodeEnum.IM_GROUP_MSG.getCode()){
+            baseKey = CacheConstant.MESSAGE_GROUP_CACHE +"||"+getMessageDTO.getTargetId();
+        } else if (getMessageDTO.getCode() == ImMsgCodeEnum.IM_USER_MSG.getCode()) {
+            String mark = Math.max(getMessageDTO.getUserId(), getMessageDTO.getTargetId())+ "and" + Math.min(getMessageDTO.getUserId(),getMessageDTO.getTargetId());
+            baseKey = CacheConstant.MESSAGE_USR_CACHE + "||"+mark;
+        }
+        // 确保这里有获取RedisTemplate的方法
+        List<ImMsgEntity> messages = redisTemplate.opsForList().range(baseKey, 0, 50);
+// 检查列表是否为空
+        // 列表为空的情况，可以根据业务逻辑处理
+        // 或者抛出异常，取决于业务逻辑
+        if (messages != null && !messages.isEmpty()) {
+            // 获取列表中的最后一条消息
+            // 处理或返回最后一条消息
+            return messages.get(messages.size() - 1); // 或者根据需要进行其他操作
+        }
+        return null;
     }
 }

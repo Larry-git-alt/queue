@@ -15,6 +15,5 @@ public class AddListCache {
 
     public void addToApplyList(AddRecordDTO addRecordDTO, Long id) {
         redisTemplate.opsForList().leftPush("queue:im:addFriendsApply:" + id + ":", addRecordDTO);
-
     }
 }
