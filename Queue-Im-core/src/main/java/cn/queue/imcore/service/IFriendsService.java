@@ -31,6 +31,8 @@ public interface IFriendsService  {
 
     List<FriendVO> queryFriendByClazz(Long id, Integer clazzId);
 
+    String setRemark(Long fromId, Long toId, String remark);
+
     String deleteFriend(Long fromId, Long toId);
 
     String blackFriend(Long fromId, Long toId);

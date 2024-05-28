@@ -3,6 +3,7 @@ package cn.queue.imcore.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.queue.base.user.domain.entity.User;
 import cn.queue.common.util.RedisUtil;
+import cn.queue.domain.valueObj.CacheConstant;
 import cn.queue.domain.vo.FriendVO;
 import cn.queue.domain.entity.AddRecordEntity;
 import cn.queue.domain.entity.ClazzEntity;
@@ -48,8 +49,8 @@ public class FriendsServiceImpl implements IFriendsService {
     private AddListCache addListCache;
     @Resource
     private IClazzDao clazzDao;
-    @Resource
-    private RedisTemplate<String, AddRecordVO> redisTemplate;
+//    @Resource
+//    private RedisTemplate<String, AddRecordVO> redisTemplate;
 
     @Override
     public List<FriendsEntity> getList(Long id) {
@@ -139,6 +140,10 @@ public class FriendsServiceImpl implements IFriendsService {
         if (!applyDao.exists(addQuery)) {
             return "该申请不存在";
         }
+        //判断两人是否已经是好友
+        if (isFriend(fromId, toId)) {
+            return "已经是好友，不可重复添加";
+        }
         //判断该申请是否已经处理过了
         if (addRecordEntity.getStatus() != 1) {
             return "该申请已经处理过了";
@@ -200,8 +205,8 @@ public class FriendsServiceImpl implements IFriendsService {
 //            opAddRecordEntity.setUpdateTime(new Date());
 //            applyDao.update(opAddRecordEntity, opAddQuery);
 //        }
-        redisTemplate.delete("queue:im:addFriendsApply:" + fromId);
-        redisTemplate.delete("queue:im:addFriendsApply:" + toId);
+        addListCache.cleanCache(fromId);
+        addListCache.cleanCache(toId);
 
         return "处理成功";
     }
@@ -261,9 +266,7 @@ public class FriendsServiceImpl implements IFriendsService {
         }
 
         log.info("查询申请列表");
-        RedisOperations<String, AddRecordVO> operations = redisTemplate.opsForList().getOperations();
-        List<AddRecordVO> range = redisTemplate.opsForList().range("queue:im:addFriendsApply:" + id, 0, -1);
-        //assert range != null;
+        List<AddRecordVO> range = addListCache.queryAddListCache(id);
         if ( !range.isEmpty()){
             return range;
         }
@@ -303,16 +306,22 @@ public class FriendsServiceImpl implements IFriendsService {
             //addListCache.addToApplyList(addRecordDTO, id);
         });
         //根据时间排序
-        addRecordVOS.stream()
+        List<AddRecordVO> collect = addRecordVOS.stream()
                 .sorted(Comparator.comparing(AddRecordVO::getCreateTime))
                 .collect(Collectors.toList());
-        addRecordVOS.forEach(addDTO->{
+        collect.forEach(addDTO->{
             addListCache.addToApplyList(addDTO, id);
         });
-        return addRecordVOS;
+        return collect;
     }
 
 
+    /**
+     * 添加分组
+     * @param id
+     * @param clazzName
+     * @return
+     */
     @Override
     public String addClazz(Long id, String clazzName) {
 
@@ -341,6 +350,12 @@ public class FriendsServiceImpl implements IFriendsService {
         return "好友分组添加成功";
     }
 
+    /**
+     * 删除分组
+     * @param id
+     * @param clazzId
+     * @return
+     */
     @Override
     @Transactional
     public String deleteClazz(Long id, Long clazzId) {
@@ -360,6 +375,13 @@ public class FriendsServiceImpl implements IFriendsService {
         return "好友分组删除成功";
     }
 
+    /**
+     * 设置好友分组
+     * @param fromId
+     * @param toId
+     * @param clazzId
+     * @return
+     */
     @Override
     public String setFriendsClazz(Long fromId, Long toId, Long clazzId){
         //判断是否为好友
@@ -405,8 +427,37 @@ public class FriendsServiceImpl implements IFriendsService {
 
             friendVOS.add(friendVO);
         });
-        //friendDTOS.stream().sorted().collect()
-        return friendVOS;
+        //根据备注排序
+
+        return friendVOS.stream()
+                .sorted(Comparator.comparing(FriendVO::getRemark))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 设置好友备注
+     * @param fromId
+     * @param toId
+     * @param remark
+     * @return
+     */
+    @Override
+    public String setRemark(Long fromId, Long toId, String remark){
+
+        //是否是好友
+        boolean friend = isFriend(fromId, toId);
+        if ( !friend){
+            return "不是好友，无法设置备注";
+        }
+
+        LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FriendsEntity::getFromId, fromId).eq(FriendsEntity::getToId, toId);
+        FriendsEntity friends = friendsDao.selectOne(queryWrapper);
+        friends.setRemark(remark);
+        friendsDao.update(friends, queryWrapper);
+
+        return "设置备注成功";
+
     }
 
     /**
