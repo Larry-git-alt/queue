@@ -1,4 +1,4 @@
-package cn.queue.domain.dto;
+package cn.queue.domain.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FriendDTO {
+public class FriendVO {
   private Long friendId;
   private String remark;
   private String photo;

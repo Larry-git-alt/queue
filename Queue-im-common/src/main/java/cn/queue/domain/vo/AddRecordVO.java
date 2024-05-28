@@ -1,4 +1,4 @@
-package cn.queue.domain.dto;
+package cn.queue.domain.vo;
 
 
 import lombok.AllArgsConstructor;
@@ -6,14 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddRecordDTO {
+public class AddRecordVO {
 
     private Long id;
 

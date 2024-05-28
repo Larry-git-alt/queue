@@ -1,14 +1,16 @@
 package cn.queue.imcore.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.queue.base.user.domain.entity.User;
 import cn.queue.common.util.RedisUtil;
-import cn.queue.domain.dto.AddRecordDTO;
+import cn.queue.domain.vo.FriendVO;
 import cn.queue.domain.entity.AddRecordEntity;
+import cn.queue.domain.entity.ClazzEntity;
 import cn.queue.domain.entity.FriendsEntity;
+import cn.queue.domain.vo.AddRecordVO;
 import cn.queue.imcore.cache.AddListCache;
 import cn.queue.imcore.dao.IApplyDao;
+import cn.queue.imcore.dao.IClazzDao;
 import cn.queue.imcore.dao.IFriendsDao;
 import cn.queue.imcore.feign.UserFeign;
 import cn.queue.imcore.service.IFriendsService;
@@ -20,10 +22,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author: Larry
@@ -44,7 +47,9 @@ public class FriendsServiceImpl implements IFriendsService {
     @Resource
     private AddListCache addListCache;
     @Resource
-    private RedisTemplate<String, AddRecordDTO> redisTemplate;
+    private IClazzDao clazzDao;
+    @Resource
+    private RedisTemplate<String, AddRecordVO> redisTemplate;
 
     @Override
     public List<FriendsEntity> getList(Long id) {
@@ -98,17 +103,17 @@ public class FriendsServiceImpl implements IFriendsService {
                 .createTime(new Date())
                 .build();
         applyDao.insert(addRecordEntity);
-        AddRecordDTO addRecordDTO = new AddRecordDTO();
-        BeanUtil.copyProperties(addRecordEntity, addRecordDTO);
-        addRecordDTO.setUsername(toUser.getUsername());
-        addRecordDTO.setPhoto(toUser.getImg());
-        addRecordDTO.setType(0);
-        addListCache.addToApplyList(addRecordDTO, toId);
+        AddRecordVO addRecordVO = new AddRecordVO();
+        BeanUtil.copyProperties(addRecordEntity, addRecordVO);
+        addRecordVO.setUsername(toUser.getUsername());
+        addRecordVO.setPhoto(toUser.getImg());
+        addRecordVO.setType(0);
+        addListCache.addToApplyList(addRecordVO, toId);
         User fromUser = userFeign.getById(fromId);
-        addRecordDTO.setUsername(fromUser.getUsername());
-        addRecordDTO.setPhoto(fromUser.getImg());
-        addRecordDTO.setType(1);
-        addListCache.addToApplyList(addRecordDTO, fromId);
+        addRecordVO.setUsername(fromUser.getUsername());
+        addRecordVO.setPhoto(fromUser.getImg());
+        addRecordVO.setType(1);
+        addListCache.addToApplyList(addRecordVO, fromId);
 
         return "好友申请发送成功";
     }
@@ -170,6 +175,7 @@ public class FriendsServiceImpl implements IFriendsService {
                     .toId(toId)
                     .status(1)
                     .black(1)
+                    .remark(userFeign.getById(toId).getUsername())
                     .createTime(new Date())
                     .build();
             friendsDao.insert(friendsEntity);
@@ -179,20 +185,21 @@ public class FriendsServiceImpl implements IFriendsService {
                     .toId(fromId)
                     .status(1)
                     .black(1)
+                    .remark(userFeign.getById(fromId).getUsername())
                     .createTime(new Date())
                     .build();
             friendsDao.insert(friendsEntity);
         }
-        //查询是否有从toId 到fromId的请求， 如果有则改变状态为已失效
-        LambdaQueryWrapper<AddRecordEntity> opAddQuery = new LambdaQueryWrapper<>();
-        opAddQuery.eq(AddRecordEntity::getFromId, toId)
-                .eq(AddRecordEntity::getToId, fromId);
-        AddRecordEntity opAddRecordEntity = applyDao.selectOne(opAddQuery);
-        if (opAddRecordEntity != null && opAddRecordEntity.getStatus() == 1) {
-            opAddRecordEntity.setStatus(4);
-            opAddRecordEntity.setUpdateTime(new Date());
-            applyDao.update(opAddRecordEntity, opAddQuery);
-        }
+//        //查询是否有从toId 到fromId的请求， 如果有则改变状态为已失效
+//        LambdaQueryWrapper<AddRecordEntity> opAddQuery = new LambdaQueryWrapper<>();
+//        opAddQuery.eq(AddRecordEntity::getFromId, toId)
+//                .eq(AddRecordEntity::getToId, fromId);
+//        AddRecordEntity opAddRecordEntity = applyDao.selectOne(opAddQuery);
+//        if (opAddRecordEntity != null && opAddRecordEntity.getStatus() == 1) {
+//            opAddRecordEntity.setStatus(4);
+//            opAddRecordEntity.setUpdateTime(new Date());
+//            applyDao.update(opAddRecordEntity, opAddQuery);
+//        }
         redisTemplate.delete("queue:im:addFriendsApply:" + fromId);
         redisTemplate.delete("queue:im:addFriendsApply:" + toId);
 
@@ -232,10 +239,9 @@ public class FriendsServiceImpl implements IFriendsService {
         }
 
         log.info("有好友记录");
-        //只有两个人对应的两条数据中的所有状态都为1，且都不处于拉黑状态才能判定为好友
-        //return friend.getStatus() == 1 && toFriend.getStatus() == 1 && toFriend.getBlack() == 1 && friend.getBlack() == 1;
-        queryWrapper.eq(FriendsEntity::getStatus, 1).eq(FriendsEntity::getBlack, 1);
-        toQueryWrapper.eq(FriendsEntity::getStatus, 1).eq(FriendsEntity::getBlack, 1);
+        //只有两个人对应的两条数据中的所有状态都为1，
+        queryWrapper.eq(FriendsEntity::getStatus, 1);
+        toQueryWrapper.eq(FriendsEntity::getStatus, 1);
         return friendsDao.exists(queryWrapper) && friendsDao.exists(toQueryWrapper);
     }
 
@@ -246,7 +252,7 @@ public class FriendsServiceImpl implements IFriendsService {
      * @return
      */
     @Override
-    public List<AddRecordDTO> getApplyList(Long id) {
+    public List<AddRecordVO> getApplyList(Long id) {
 
         //判断用户是否存在
         User user = userFeign.getById(id);
@@ -255,8 +261,8 @@ public class FriendsServiceImpl implements IFriendsService {
         }
 
         log.info("查询申请列表");
-        RedisOperations<String, AddRecordDTO> operations = redisTemplate.opsForList().getOperations();
-        List<AddRecordDTO> range = redisTemplate.opsForList().range("queue:im:addFriendsApply:" + id, 0, -1);
+        RedisOperations<String, AddRecordVO> operations = redisTemplate.opsForList().getOperations();
+        List<AddRecordVO> range = redisTemplate.opsForList().range("queue:im:addFriendsApply:" + id, 0, -1);
         //assert range != null;
         if ( !range.isEmpty()){
             return range;
@@ -268,36 +274,186 @@ public class FriendsServiceImpl implements IFriendsService {
         toQueryWrapper.eq(AddRecordEntity::getToId, id);
 
         List<AddRecordEntity> beList = applyDao.selectList(toQueryWrapper);
-        List<AddRecordDTO> addRecordDTOS = new ArrayList<>();
-        AddRecordDTO addRecordDTO = new AddRecordDTO();
+        List<AddRecordVO> addRecordVOS = new ArrayList<>();
+        AddRecordVO addRecordVO = new AddRecordVO();
         beList.forEach(addRecordEntity -> {
-            BeanUtil.copyProperties(addRecordEntity, addRecordDTO);
+            BeanUtil.copyProperties(addRecordEntity, addRecordVO);
             User fromUser = userFeign.getById(addRecordEntity.getFromId());
-            addRecordDTO.setPhoto(fromUser.getImg());
-            addRecordDTO.setUpdateTime(new Date());
-            addRecordDTO.setType(0);
-            addRecordDTO.setUsername(fromUser.getUsername());
-            addRecordDTOS.add(addRecordDTO);
+            addRecordVO.setPhoto(fromUser.getImg());
+            addRecordVO.setUpdateTime(new Date());
+            addRecordVO.setType(0);
+            addRecordVO.setUsername(fromUser.getUsername());
+            addRecordVOS.add(addRecordVO);
             //放入redis缓存
-            addListCache.addToApplyList(addRecordDTO, id);
+            //addListCache.addToApplyList(addRecordDTO, id);
         });
 
         LambdaQueryWrapper<AddRecordEntity> queryWrapper = new LambdaQueryWrapper<AddRecordEntity>()
                 .eq(AddRecordEntity::getFromId, id);
         List<AddRecordEntity> list = applyDao.selectList(queryWrapper);
         list.forEach(addRecordEntity -> {
-            BeanUtil.copyProperties(addRecordEntity, addRecordDTO);
+            BeanUtil.copyProperties(addRecordEntity, addRecordVO);
             User toUser = userFeign.getById(addRecordEntity.getToId());
-            addRecordDTO.setPhoto(toUser.getImg());
-            addRecordDTO.setUpdateTime(new Date());
-            addRecordDTO.setType(1);
-            addRecordDTO.setUsername(toUser.getUsername());
-            addRecordDTOS.add(addRecordDTO);
+            addRecordVO.setPhoto(toUser.getImg());
+            addRecordVO.setUpdateTime(new Date());
+            addRecordVO.setType(1);
+            addRecordVO.setUsername(toUser.getUsername());
+            addRecordVOS.add(addRecordVO);
             //放入redis缓存
-            addListCache.addToApplyList(addRecordDTO, id);
+            //addListCache.addToApplyList(addRecordDTO, id);
         });
-        //addListCache.addToApplyList(addRecordDTOS, id);
-        return addRecordDTOS;
+        //根据时间排序
+        addRecordVOS.stream()
+                .sorted(Comparator.comparing(AddRecordVO::getCreateTime))
+                .collect(Collectors.toList());
+        addRecordVOS.forEach(addDTO->{
+            addListCache.addToApplyList(addDTO, id);
+        });
+        return addRecordVOS;
+    }
+
+
+    @Override
+    public String addClazz(Long id, String clazzName) {
+
+        //一个用户最多设置地分组数进行限制
+        LambdaQueryWrapper<ClazzEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ClazzEntity::getUserId, id);
+        Long count = clazzDao.selectCount(wrapper);
+        if (count >= 12){
+            return "分组设置上限了";
+        }
+
+        //分组名不能重复
+        wrapper.eq(ClazzEntity::getClazzName, clazzName);
+        boolean exists = clazzDao.exists(wrapper);
+        if (exists){
+            return "分组名已存在";
+        }
+
+        ClazzEntity clazz = new ClazzEntity().builder()
+                .userId(id)
+                .clazzId(count)
+                .clazzName(clazzName)
+                .build();
+        clazzDao.insert(clazz);
+
+        return "好友分组添加成功";
+    }
+
+    @Override
+    @Transactional
+    public String deleteClazz(Long id, Long clazzId) {
+        //原分组的好友设置到默认分组中--0
+        LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FriendsEntity::getFromId, id).eq(FriendsEntity::getClazzId, clazzId);
+        List<FriendsEntity> friendsEntities = friendsDao.selectList(queryWrapper);
+        friendsEntities.forEach(friendsEntity -> {
+            friendsEntity.setClazzId(0L);
+            LambdaQueryWrapper<FriendsEntity> wrapper = new LambdaQueryWrapper<>();
+            friendsDao.update(friendsEntity,
+                    wrapper.eq(FriendsEntity::getFromId, id).eq(FriendsEntity::getClazzId, clazzId));
+        });
+        LambdaQueryWrapper<ClazzEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ClazzEntity::getUserId, id).eq(ClazzEntity::getClazzId, clazzId);
+        clazzDao.delete(wrapper);
+        return "好友分组删除成功";
+    }
+
+    @Override
+    public String setFriendsClazz(Long fromId, Long toId, Long clazzId){
+        //判断是否为好友
+        if (!isFriend(fromId, toId)) {
+            return "不是好友，设置失败";
+        }
+        //判断是否有该分组
+        LambdaQueryWrapper<ClazzEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ClazzEntity::getUserId, fromId).eq(ClazzEntity::getClazzId, clazzId);
+        boolean exists = clazzDao.exists(wrapper);
+        if (!exists) {
+            return "没有该分组，设置失败";
+        }
+
+        //设置分组
+        LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FriendsEntity::getFromId, fromId).eq(FriendsEntity::getToId, toId);
+        FriendsEntity friends = friendsDao.selectOne(queryWrapper);
+        friends.setClazzId(clazzId);
+        friendsDao.update(friends, queryWrapper);
+        return "好友分组设置成功";
+    }
+
+    /**
+     * 根据分组查询好友
+     * @param id
+     * @param clazzId
+     * @return
+     */
+    @Override
+    public List<FriendVO> queryFriendByClazz(Long id, Integer clazzId){
+        LambdaQueryWrapper<FriendsEntity> listLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        listLambdaQueryWrapper.eq(FriendsEntity::getFromId, id).eq(FriendsEntity::getClazzId, clazzId);
+        List<FriendsEntity> friendsEntities = friendsDao.selectList(listLambdaQueryWrapper);
+
+        List<FriendVO> friendVOS = new ArrayList<>();
+        friendsEntities.forEach(friendsEntity -> {
+            FriendVO friendVO = new FriendVO();
+            Long toId = friendsEntity.getToId();
+            friendVO.setFriendId(toId);
+            friendVO.setRemark(friendsEntity.getRemark());
+            friendVO.setPhoto(friendsEntity.getPhoto());
+
+            friendVOS.add(friendVO);
+        });
+        //friendDTOS.stream().sorted().collect()
+        return friendVOS;
+    }
+
+    /**
+     * 删除好友
+     * @param fromId
+     * @param toId
+     * @return
+     */
+    @Override
+    public String deleteFriend(Long fromId, Long toId) {
+        //将friend表中的status改为2，black改为2
+        LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FriendsEntity::getFromId, fromId).eq(FriendsEntity::getToId, toId);
+        FriendsEntity friends = friendsDao.selectOne(queryWrapper);
+        if (!isFriend(fromId, toId)) {
+            return "不是好友，删除失败";
+        }
+        friends.setStatus(2);
+        friends.setBlack(2);
+        friendsDao.update(friends, queryWrapper);
+        return "删除成功";
+    }
+
+    /**
+     * 拉黑好友
+     * @param fromId
+     * @param toId
+     * @return
+     */
+    @Override
+    public String blackFriend(Long fromId, Long toId) {
+        //判断两人是否是好友
+        LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FriendsEntity::getFromId, fromId).eq(FriendsEntity::getToId, toId);
+        if (!isFriend(fromId, toId)) {
+            return "不是好友，拉黑失败";
+        }
+        //判断两人的好友状态
+        FriendsEntity friends = friendsDao.selectOne(queryWrapper);
+        if (friends.getStatus() == 2) {
+            return "已经是拉黑状态";
+        }
+        //设置black为2
+        friends.setBlack(2);
+        friendsDao.update(friends, queryWrapper);
+
+        return "拉黑成功";
     }
 
 }
