@@ -18,4 +18,5 @@ public class FriendDTO {
   private Long friendId;
   private String remark;
   private String photo;
+
 }

@@ -27,19 +27,16 @@ public class ImMsgEntity{
     private String createTime;
 
     private String content;
-
+   //消息类型
     private Integer code;
-
+//文件类型
     private String fileType;
-//     "isRead":0
-    //0表示未读 1表示已读
-//    private Integer isRead;
+//    消息序列号
+    private Long sequence;
 //    //测试数据
 //    {
-//           "id":1,
-//            "userId": 33
+//            "userId": 33,
 //            "targetId": 22,
-//            "createTime": "2024-05-19T12:00:00",
 //            "content": "Hello, this is a test message.",
 //            "code": 1003,
 //            "fileType": "text",

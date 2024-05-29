@@ -209,7 +209,7 @@ public class FriendsServiceImpl implements IFriendsService {
         addListCache.cleanCache(fromId);
         addListCache.cleanCache(toId);
 
-        return "处理成功";
+        return "处成理功";
     }
 
     /**

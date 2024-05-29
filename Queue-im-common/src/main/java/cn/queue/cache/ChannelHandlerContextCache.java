@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author idea
@@ -19,7 +20,7 @@ public class ChannelHandlerContextCache {
     /**
      *
      */
-    private static Map<Long, ChannelHandlerContext> UserchannelHandlerContextMap = new HashMap<>();
+    private static Map<Long, ChannelHandlerContext> UserchannelHandlerContextMap = new ConcurrentHashMap<>();
 
 
     public static String getServerIpAddress() {

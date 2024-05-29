@@ -17,6 +17,7 @@ import java.util.List;
  */
 @Component
 public class GroupCache {
+
     @Resource
     private RedisUtil redisUtil;
     @Resource
@@ -24,7 +25,7 @@ public class GroupCache {
 
     public List<GroupEntity> getGroup(Long groupId){
         String key = CacheConstant.GROUP_LIST_CACHE+groupId;
-        //最多只能加500个好友
-        return redisTemplate.opsForList().range(key,0,50);
+        //最多只能加500个群聊
+        return redisTemplate.opsForList().range(key,0,500);
     }
 }

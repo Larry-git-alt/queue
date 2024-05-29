@@ -14,8 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetMessageDTO {
+public class GetMessageDTO extends PageDTO {
     private Long userId;
     private Long targetId;
     private Integer code;
+
 }

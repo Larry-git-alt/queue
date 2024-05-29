@@ -20,6 +20,7 @@ mybatis-plus:
     cache-enabled: true
     use-generated-keys: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: cn/queue/imcore/**/*.xml
 logging:
   level:
     cn:
