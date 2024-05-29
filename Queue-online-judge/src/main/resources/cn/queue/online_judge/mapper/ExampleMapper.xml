@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.queue.online_judge.mapper.ExampleMapper">
+
+
+     <!-- 新增用例   -->
+    <insert id="insert" parameterType="cn.queue.online_judge.pojo.Example">
+         insert into example(problem_id, input, output) values
+        <foreach collection="examples" separator="," item="item">
+            (#{item.problemId}, #{item.input}, #{item.output})
+         </foreach>
+    </insert>
+
+    <!-- 修改用例   -->
+    <update id="update" parameterType="cn.queue.online_judge.pojo.Example">
+            update example
+            <set>
+                <if test="example.input != null">
+                    input = #{example.input},
+                </if>
+                <if test="example.output != null">
+                    output = #{example.output},
+                </if>
+            </set>
+            <where>
+                id = #{example.id}
+            </where>
+    </update>
+
+</mapper>

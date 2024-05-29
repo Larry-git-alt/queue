@@ -29,7 +29,7 @@ public class CommonResult<T> implements Serializable {
 
 
     /**
-     * @return 成功提示信息
+     * @return 成功提示信息 vo dto
      */
     public static <T> CommonResult<T> success() {
         return CommonResult.<T>builder()
