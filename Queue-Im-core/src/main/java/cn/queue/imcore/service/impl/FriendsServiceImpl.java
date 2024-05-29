@@ -17,9 +17,13 @@ import cn.queue.imcore.dao.IFriendsDao;
 import cn.queue.imcore.feign.UserFeign;
 import cn.queue.imcore.service.IFriendsService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -442,29 +446,32 @@ public class FriendsServiceImpl implements IFriendsService {
     /**
      * 分页查询好友列表
      * @param id
-     * @param page
-     * @param size
      * @return
      */
     @Override
-    public List<FriendVO> queryPageFriend(Long id, Integer page, Integer size){
+    public List<FriendVO> queryPageFriend(Long id, Integer pageSize, Integer pageNum) {
+        // 创建分页参数对象
+        Page<FriendsEntity> page = new Page<>(pageSize,pageNum);
 
-        Page<FriendsEntity> pag = new Page<>(page, size);
+        // 使用分页参数执行查询
         LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FriendsEntity::getFromId, id)
                 .orderByAsc(FriendsEntity::getRemark);
-
-        Page<FriendsEntity> selectPage = friendsDao.selectPage(pag, queryWrapper);
-        System.err.println(selectPage.getRecords());
-        List<FriendVO> friendsVOS =
-        selectPage.getRecords().stream().map(friendsEntity -> {
-            FriendVO friendVO = new FriendVO();
-            friendVO.setFriendId(friendsEntity.getToId());
-            friendVO.setRemark(friendsEntity.getRemark());
-            friendVO.setPhoto(friendsEntity.getPhoto());
-            return friendVO;
-        }).sorted(Comparator.nullsLast(Comparator.comparing(FriendVO::getRemark)))
+        IPage<FriendsEntity> friendsPage = friendsDao.selectPage(page, queryWrapper);
+        System.out.println(friendsPage.getRecords());
+        // 转换数据
+        List<FriendVO> friendsVOS = friendsPage.getRecords().stream()
+                .map(friendsEntity -> {
+                    FriendVO friendVO = new FriendVO();
+                    friendVO.setFriendId(friendsEntity.getToId());
+                    friendVO.setRemark(friendsEntity.getRemark());
+                    friendVO.setPhoto(friendsEntity.getPhoto());
+                    return friendVO;
+                })
+                .sorted(Comparator.nullsLast(Comparator.comparing(FriendVO::getRemark)))
                 .collect(Collectors.toList());
+
+        // 创建分页结果对象
 
         return friendsVOS;
     }
