@@ -15,9 +15,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class SessionVO {
-    private Long id;
-    private String name;
+    private Long toId;
+    private Integer isOnline;
+    private String name;//群名或者用户名
     private String photo;
-    private String type;
-    private String lastMessage;
+    private Integer type;//会话类型（群聊、私聊）
+    private String lastMessageContent;//最后一条消息的内容
+    private String lastTime;//最后一条消息的时间
+    private Long noReadMessage;//未读消息数
 }

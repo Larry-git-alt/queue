@@ -1,7 +1,7 @@
 package cn.queue.imcore.handler;
 import cn.queue.cache.ChannelHandlerContextCache;
+import cn.queue.domain.vo.SessionVO;
 import cn.queue.imcore.repository.SessionRepository;
-import cn.queue.imcore.vo.SessionVO;
 import cn.queue.util.ImContextUtils;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -81,7 +81,7 @@ public class WsSharkHandler extends ChannelInboundHandlerAdapter {
             ImContextUtils.setUserId(ctx,id);
             ChannelHandlerContextCache.put(id,ctx);
             System.out.println(ChannelHandlerContextCache.get(id));
-            this.OnlineNotice(id);
+//            this.OnlineNotice(id);
         //建立ws的握手连接
         webSocketServerHandshaker = wsFactory.newHandshaker(msg);
         if (webSocketServerHandshaker == null) {
@@ -92,12 +92,12 @@ public class WsSharkHandler extends ChannelInboundHandlerAdapter {
 
     }
 
-    private void OnlineNotice(Long userId){
-        List<SessionVO> sessionVOList = wsSharkHandler.sessionRepository.getSessionVOList(userId);
-        sessionVOList.forEach(
-                sessionVO -> sendMessageToUser(sessionVO.getId(),userId+"上线了")
-        );
-    }
+//    private void OnlineNotice(Long userId){
+//        List<SessionVO> sessionVOList = wsSharkHandler.sessionRepository.getSessionVOList(userId);
+//        sessionVOList.forEach(
+//                sessionVO -> sendMessageToUser(sessionVO.getToId(),userId+"上线了")
+//        );
+//    }
     public static void sendMessageToUser(Long userId, String message) {
         ChannelHandlerContext ctx = ChannelHandlerContextCache.get(userId);
         if (ctx != null && ctx.channel().isActive()) {

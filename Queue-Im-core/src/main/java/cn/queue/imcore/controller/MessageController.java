@@ -7,7 +7,9 @@ import cn.queue.domain.entity.ImMsgEntity;
 import cn.queue.domain.pack.MessageReadContent;
 import cn.queue.domain.valueObj.CacheConstant;
 import cn.queue.domain.valueObj.Constants;
+import cn.queue.domain.vo.SessionVO;
 import cn.queue.imcore.dao.ImConversationSetMapper;
+import cn.queue.imcore.repository.SessionRepository;
 import cn.queue.imcore.service.ConversationService;
 import cn.queue.imcore.service.IMessageService;
 import jakarta.annotation.Resource;
@@ -27,6 +29,8 @@ public class MessageController {
     private ConversationService conversationService;
     @Resource
     private IMessageService messageService;
+    @Resource
+    private SessionRepository sessionRepository;
     @GetMapping("/getMessage")
     public List<ImMsgEntity> imMsgEntities(){
         GetMessageDTO getMessageDTO = new GetMessageDTO();
@@ -36,6 +40,10 @@ public class MessageController {
         getMessageDTO.setPageNum(1L);
         getMessageDTO.setPageSize(2L);
        return messageService.getHistoryMessage(getMessageDTO);
+    }
+    @GetMapping("/session")
+    public List<SessionVO> getSessionVo(){
+      return sessionRepository.getSessionVOList(3333L);
     }
     @PostMapping("/test")
     public void set(){

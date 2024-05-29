@@ -1,13 +1,16 @@
 package cn.queue.imcore.repository;
+import cn.queue.cache.ChannelHandlerContextCache;
 import cn.queue.domain.dto.GetMessageDTO;
 import cn.queue.domain.entity.FriendsEntity;
 import cn.queue.domain.entity.GroupEntity;
 import cn.queue.domain.entity.ImMsgEntity;
+import cn.queue.domain.valueObj.CacheConstant;
 import cn.queue.domain.valueObj.ImMsgCodeEnum;
+import cn.queue.domain.vo.SessionVO;
 import cn.queue.imcore.cache.MessageCache;
 import cn.queue.imcore.service.IFriendsService;
 import cn.queue.imcore.service.IGroupService;
-import cn.queue.imcore.vo.SessionVO;
+
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Repository;
 
@@ -36,13 +39,16 @@ public class SessionRepository {
        friendlist.forEach(
 
                friendsEntity ->{
+                   Integer isOnline = ChannelHandlerContextCache.get(friendsEntity.getToId()) ==null ? 0 : 1;
                    GetMessageDTO getMessageDTO = GetMessageDTO.builder()
                            .userId(userId)
                            .targetId(friendsEntity.getToId())
                            .code(ImMsgCodeEnum.IM_USER_MSG.getCode())
                            .build();
                    ImMsgEntity lastMessage = messageCache.getLastMessage(getMessageDTO);
-                   transformSession(friendsEntity.getId(), friendsEntity.getRemark(), friendsEntity.getPhoto(),lastMessage.getContent(),lastMessage.getCreateTime(),sessionVOS);
+                   String content = lastMessage !=null ? lastMessage.getContent() : null;
+                   String time = lastMessage !=null ? lastMessage.getCreateTime() :null;
+                   transformSession(friendsEntity.getToId(),getMessageDTO.getCode(), friendsEntity.getRemark(), friendsEntity.getPhoto(),content,time,sessionVOS,isOnline);
                }
 
        );
@@ -54,19 +60,21 @@ public class SessionRepository {
                            .code(ImMsgCodeEnum.IM_GROUP_MSG.getCode())
                            .build();
                    ImMsgEntity lastMessage = messageCache.getLastMessage(getMessageDTO);
-                   transformSession(groupEntity.getId(), groupEntity.getGroupName(), groupEntity.getPhoto(),lastMessage.getContent(),lastMessage.getCreateTime(), sessionVOS);
+                   transformSession(groupEntity.getId(),getMessageDTO.getCode(),groupEntity.getGroupName(), groupEntity.getPhoto(),lastMessage.getContent(),lastMessage.getCreateTime(), sessionVOS,1);
                }
        );
        return sessionVOS;
    }
 
-    private void transformSession(Long id, String name, String photo, String content, String time, List<SessionVO> sessionVOS) {
+    private void transformSession(Long id, Integer type, String name, String photo, String content, String time, List<SessionVO> sessionVOS,Integer isOnline) {
         SessionVO sessionVO = SessionVO.builder()
-                .id(id)
+                .toId(id)
+                .type(type)
                 .name(name)
                 .photo(photo)
-                .LastMessageContent(content)
-                .LastTime(time)
+                .lastMessageContent(content)
+                .lastTime(time)
+                .isOnline(isOnline)
                 .build();
         sessionVOS.add(sessionVO);
     }

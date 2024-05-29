@@ -3,8 +3,10 @@ import cn.queue.cache.ChannelHandlerContextCache;
 import cn.queue.common.util.SnowUtil;
 import cn.queue.domain.entity.ImMsgEntity;
 import cn.queue.domain.event.BaseEvent;
+import cn.queue.domain.pack.MessageReadContent;
 import cn.queue.domain.valueObj.TopicConstant;
 import cn.queue.imcore.handler.SimplyHandler;
+import cn.queue.imcore.service.ConversationService;
 import cn.queue.imcore.service.IMessageService;
 import cn.queue.util.ImContextUtils;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,6 +16,7 @@ import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.SimpleAssociationHandler;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.scanner.Constant;
 
 /**
  * @author: Larry
@@ -25,14 +28,21 @@ public class AckMessageHandler implements SimplyHandler {
 
     @Resource
     private IMessageService messageService;
+    @Resource
+    private ConversationService conversationService;
     @Override
     public void handler(ChannelHandlerContext ctx, ImMsgEntity imMsg) {
         Long userId = ImContextUtils.getUserId(ctx);
-        //直接向对方返回消息包
+        MessageReadContent messageReadContent = MessageReadContent.
+                builder()
+                .messageSequence(imMsg.getSequence())
+                .fromId(imMsg.getUserId().toString())
+                .toId(imMsg.getTargetId().toString())
+                .conversationType(2)
+                .build();
+        conversationService.messageMarkRead(messageReadContent);
         if(userId!=null && ChannelHandlerContextCache.get(imMsg.getTargetId())!=null){
-            sendMessageToUser(imMsg.getTargetId(), imMsg.getContent());
-
-            //异步更新数据库消息状态
+            sendMessageToUser(imMsg.getTargetId(), String.valueOf(imMsg.getSequence()));
         }
     }
     public static void sendMessageToUser(Long userId, String message) {

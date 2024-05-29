@@ -36,9 +36,11 @@ public class UserMessageHandler implements SimplyHandler {
                 if(userId!=null && ChannelHandlerContextCache.get(imMsg.getTargetId())!=null){
                     sendMessageToUser(imMsg.getTargetId(), imMsg.getContent());
                 }
+
                 //否则mq异步写入数据库和mq
                 imMsg.setId(SnowUtil.getSnowflakeNextId());
                 imMsg.setCreateTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
                 messageService.addMessage(imMsg);
 //                eventPublisher.publish(TopicConstant.IMAGE_ADD_TOPIC,imMsg);
     }
