@@ -22,6 +22,8 @@
         <module>Queue-fourm</module>
         <module>Queue-file</module>
         <module>Queue-base</module>
+        <module>Queue-online-judge</module>
+        <module>Queue-im-consumer</module>
     </modules>
 
     <properties>
@@ -38,6 +40,8 @@
         <kaptcha.version>2.3.2</kaptcha.version>
         <mybatis-plus-boot-starter.version>3.5.5</mybatis-plus-boot-starter.version>
         <fastjson.version>1.2.71</fastjson.version>
+        <mybatis-plus-generator.version>3.5.5</mybatis-plus-generator.version>
+        <pagehelper-spring-boot-starter.version>1.4.7</pagehelper-spring-boot-starter.version>
     </properties>
 
     <dependencyManagement>
@@ -67,6 +71,24 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis-plus-generator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper-spring-boot-starter.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mybatis</groupId>
+                        <artifactId>mybatis</artifactId>
+                    </exclusion>
+            </exclusions>
             </dependency>
 
             <dependency>

@@ -6,6 +6,7 @@ import cn.queue.common.annnotation.LarryController;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -14,14 +15,14 @@ import java.util.List;
  * @Date: 2024/05/20/17:41
  */
 @LarryController
-@RequestMapping("/base/user")
+@RequestMapping("/user")
 public class UserController {
 
     @Resource
     private UserService userService;
 
     @GetMapping("/getById")
-    public User getById (Long id) {
+    public User getById (@RequestParam("id") Long id) {
         return userService.getById(id);
     }
 
