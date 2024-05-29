@@ -30,4 +30,5 @@ public class FriendsEntity {
   private Date createTime;
   private String photo;
   private String extra;
+  private Long clazzId;
 }

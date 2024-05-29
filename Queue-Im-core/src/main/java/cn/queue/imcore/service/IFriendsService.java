@@ -1,9 +1,9 @@
 package cn.queue.imcore.service;
 
 
-import cn.queue.domain.dto.AddRecordDTO;
 import cn.queue.domain.entity.FriendsEntity;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import cn.queue.domain.vo.AddRecordVO;
+import cn.queue.domain.vo.FriendVO;
 
 import java.util.List;
 
@@ -21,5 +21,19 @@ public interface IFriendsService  {
 
     boolean isFriend(Long fromId, Long toId);
 
-    List<AddRecordDTO> getApplyList(Long id);
+    List<AddRecordVO> getApplyList(Long id);
+
+    String addClazz(Long id, String clazzName);
+
+    String deleteClazz(Long id, Long clazzId);
+
+    String setFriendsClazz(Long fromId, Long toId, Long clazzId);
+
+    List<FriendVO> queryFriendByClazz(Long id, Integer clazzId);
+
+    String setRemark(Long fromId, Long toId, String remark);
+
+    String deleteFriend(Long fromId, Long toId);
+
+    String blackFriend(Long fromId, Long toId);
 }
