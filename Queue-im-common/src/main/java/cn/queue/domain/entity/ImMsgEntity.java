@@ -31,8 +31,8 @@ public class ImMsgEntity{
     private Integer code;
 //文件类型
     private String fileType;
-//    0表示未读 1表示已读
-    private Integer isRead;
+//    消息序列号
+    private Long sequence;
 //    //测试数据
 //    {
 //            "userId": 33,

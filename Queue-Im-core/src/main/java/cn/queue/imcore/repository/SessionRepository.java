@@ -47,7 +47,6 @@ public class SessionRepository {
 
        );
        groupList.forEach(
-
                groupEntity -> {
                    GetMessageDTO getMessageDTO = GetMessageDTO.builder()
                            .userId(userId)

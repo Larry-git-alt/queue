@@ -196,7 +196,7 @@ public class FriendsServiceImpl implements IFriendsService {
         redisTemplate.delete("queue:im:addFriendsApply:" + fromId);
         redisTemplate.delete("queue:im:addFriendsApply:" + toId);
 
-        return "处理成功";
+        return "处成理功";
     }
 
     /**

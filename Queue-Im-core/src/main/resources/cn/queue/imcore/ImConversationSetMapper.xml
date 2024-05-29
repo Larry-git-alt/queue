@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.queue.imcore.dao.ImConversationSetMapper">
+
+    <update id="readMark" parameterType="cn.queue.domain.entity.ImConversationSetEntity">
+        update im_conversation_set
+        set read_sequence = #{readSequence}, sequence = #{sequence}
+        where  conversation_id = #{conversationId} and read_sequence <![CDATA[<]]> #{sequence};
+    </update>
+
+    <select id="getConversationSetMaxSeq" parameterType="map" resultType="java.lang.Long">
+        select max(sequence) from im_conversation_set
+        where from_id = #{fromId};
+    </select>
+
+    <select id="getConversationMaxSeq" resultType="java.lang.Long">
+        select max(sequence) from im_conversation_set
+    </select>
+</mapper>

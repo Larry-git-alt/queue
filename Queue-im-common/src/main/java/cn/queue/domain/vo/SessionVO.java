@@ -19,4 +19,5 @@ public class SessionVO {
     private String name;
     private String photo;
     private String type;
+    private String lastMessage;
 }
