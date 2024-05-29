@@ -1,9 +1,9 @@
 package cn.queue.imcore.repository;
 import cn.queue.domain.entity.FriendsEntity;
 import cn.queue.domain.entity.GroupEntity;
+import cn.queue.domain.vo.SessionVO;
 import cn.queue.imcore.service.IFriendsService;
 import cn.queue.imcore.service.IGroupService;
-import cn.queue.imcore.vo.SessionVO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Repository;
 
