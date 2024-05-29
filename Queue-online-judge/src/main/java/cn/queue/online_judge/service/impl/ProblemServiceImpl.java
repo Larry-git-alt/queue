@@ -6,6 +6,7 @@ import cn.queue.online_judge.pojo.Example;
 import cn.queue.online_judge.pojo.PageBean;
 import cn.queue.online_judge.pojo.Problem;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import jakarta.annotation.Resource;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import cn.queue.online_judge.service.ProblemService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,15 +27,19 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public void create(Problem problem) {
+        LocalDateTime now = LocalDateTime.now();
+        problem.setCreateTime(now);
+        problem.setUpdateTime(now);
+        problem.setCreateBy("y");
+        problem.setUpdateBy("y");
+        problemMapper.insert(problem);
+
         List<Example> examples = problem.getExamples();
-        Integer id = problem.getId();
 
         examples.forEach(e -> {
-            e.setProblemId(id);
-
+            e.setProblemId(problem.getId());
         });
-
-        problemMapper.insert(problem);
+        exampleMapper.insert(examples);
     }
 
 //    @Override
@@ -43,7 +49,10 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public Problem getById(Integer id) {
-        return problemMapper.getById(id);
+        Problem problem = problemMapper.getById(id);
+        List<Example> examples = exampleMapper.getById(id);
+        problem.setExamples(examples);
+        return problem;
     }
 
 //    @Override
@@ -58,12 +67,20 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public void delete(List<Integer> ids) {
-        problemMapper.delete(ids);
+        problemMapper.deleteBatchIds(ids);
     }
 
     @Override
     public void update(Problem problem) {
+        problem.setUpdateTime(LocalDateTime.now());
         problemMapper.update(problem);
+        List<Example> examples = problem.getExamples();
+
+        examples.forEach(e -> {
+            e.setProblemId(problem.getId());
+            exampleMapper.update(e);
+        });
+        //exampleMapper.update(examples);
     }
 
     @Override

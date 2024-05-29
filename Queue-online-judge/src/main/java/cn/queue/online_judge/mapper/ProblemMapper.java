@@ -10,12 +10,12 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface ProblemMapper {
+public interface ProblemMapper extends BaseMapper<Problem>{
     /**
      * 新增题目
      * @param problem
      */
-    void insert(Problem problem);
+//    void insert(Problem problem);
 
     /**
      *根据标签查询题目
@@ -67,4 +67,7 @@ public interface ProblemMapper {
      * @return
      */
     List<Problem> list(String tags, String title, Short difficulty);
+
+
+
 }

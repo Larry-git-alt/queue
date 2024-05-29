@@ -12,13 +12,12 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Discussion {
-    private Integer id;//ID
-    private Integer problemId;//题目ID
-    private Integer userId;//用户ID
+public class Discussion extends BaseEntity{
+    private Long id;//ID
+    private Long problemId;//题目ID
+    private Long userId;//用户ID
     private String title;//讨论标题
     private String  content;//讨论内容
     private Integer views;//浏览数
     private Integer support;//支持数
-    private LocalDateTime createTime;//创建时间
 }

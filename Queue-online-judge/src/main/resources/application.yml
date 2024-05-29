@@ -19,7 +19,11 @@ mybatis-plus:
   type-aliases-package: cn.queue.online_judge.pojo
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-not-delete-value: 0
+      logic-delete-value: 1
 
 logging:
   level:
@@ -27,3 +31,4 @@ logging:
       queue:
         batch:
           mapper: trace
+

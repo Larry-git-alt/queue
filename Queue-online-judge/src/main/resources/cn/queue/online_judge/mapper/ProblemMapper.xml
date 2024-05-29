@@ -5,10 +5,10 @@
 <mapper namespace="cn.queue.online_judge.mapper.ProblemMapper">
 
     <!-- 新增题目   -->
-    <insert id="insert">
-        insert into problem(title,content,time_limit,memory_limit,difficulty,tags,input_format,output_format,`range`,languages)
-                    values (#{title},#{content},#{timeLimit},#{memoryLimit},#{difficulty},#{tags},#{inputFormat},#{outputFormat},#{range},#{languages})
-    </insert>
+<!--    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">-->
+<!--        insert into problem(title,content,time_limit,memory_limit,difficulty,tags,input_format,output_format,`range`,languages)-->
+<!--                    values (#{title},#{content},#{timeLimit},#{memoryLimit},#{difficulty},#{tags},#{inputFormat},#{outputFormat},#{range},#{languages})-->
+<!--    </insert>-->
 
     <!--    修改题目-->
     <update id="update">
@@ -25,6 +25,7 @@
             <if test="outputFormat != null and outputFormat != ''"> output_format = #{outputFormat}</if>
             <if test="range != null and range != ''"> `range` = #{range}</if>
             <if test="languages != null and languages != ''"> languages = #{languages}</if>
+            <if test="updateTime != null"> update_time = #{updateTime} </if>
         </set>
         where id = #{id}
     </update>
