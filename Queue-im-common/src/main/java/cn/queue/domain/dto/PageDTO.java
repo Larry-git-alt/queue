@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class PageDTO {
     //页码
-    private Integer page;
+    public Integer page;
     //每页大小
-    private Integer size;
+    public Integer size;
 
 }
