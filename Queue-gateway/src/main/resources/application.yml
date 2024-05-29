@@ -20,6 +20,10 @@ spring:
           uri: http://localhost:9000
           predicates:
             - Path=/im-core/**
+        - id: video
+          uri: http://localhost:9001
+          predicates:
+            - Path=/video/**
       globalcors:
         cors-configurations:
           '[/**]':

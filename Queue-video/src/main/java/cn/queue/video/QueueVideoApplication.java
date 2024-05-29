@@ -1,5 +1,6 @@
 package cn.queue.video;
 
+import org.dromara.easyes.starter.register.EsMapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -7,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
 
 @SpringBootApplication(scanBasePackages = {"cn.queue"} )
+@EsMapperScan("cn.queue.video.esmapper")
 public class QueueVideoApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(QueueVideoApplication.class);
