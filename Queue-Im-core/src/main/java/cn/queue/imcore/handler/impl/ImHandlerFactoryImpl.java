@@ -1,6 +1,6 @@
 package cn.queue.imcore.handler.impl;
-import cn.queue.imcore.constant.ImMsgCodeEnum;
-import cn.queue.imcore.domain.entity.ImMsgEntity;
+import cn.queue.domain.entity.ImMsgEntity;
+import cn.queue.domain.valueObj.ImMsgCodeEnum;
 import cn.queue.imcore.handler.ImHandlerFactory;
 import cn.queue.imcore.handler.SimplyHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,8 +42,8 @@ public class ImHandlerFactoryImpl implements ImHandlerFactory, InitializingBean 
     public void afterPropertiesSet() throws Exception {
 
         simplyHandlerMap.put(ImMsgCodeEnum.IM_USER_MSG.getCode(),applicationContext.getBean(UserMessageHandler.class));
-//        simplyHandlerMap.put(ImMsgCodeEnum.IM_HEARTBEAT_MSG.getCode(), applicationContext.getBean(HeartBeatHandler.class));
-//        simplyHandlerMap.put(ImMsgCodeEnum.IM_GROUP_MSG.getCode(),applicationContext.getBean(GroupMessageHandler.class));
+        simplyHandlerMap.put(ImMsgCodeEnum.IM_HEARTBEAT_MSG.getCode(), applicationContext.getBean(HeartBeatHandler.class));
+        simplyHandlerMap.put(ImMsgCodeEnum.IM_GROUP_MSG.getCode(),applicationContext.getBean(GroupMessageHandler.class));
     }
 
 

@@ -22,6 +22,7 @@
         <module>Queue-fourm</module>
         <module>Queue-file</module>
         <module>Queue-base</module>
+        <module>Queue-im-consumer</module>
     </modules>
 
     <properties>

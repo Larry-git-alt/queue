@@ -1,5 +1,6 @@
 package cn.queue.imcore.encoder;
-import cn.queue.imcore.domain.entity.ImMsgEntity;
+
+import cn.queue.domain.entity.ImMsgEntity;
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;

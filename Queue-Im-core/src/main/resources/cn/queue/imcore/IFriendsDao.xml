@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.queue.imcore.dao.IFriendsDao">
+
+
+    <select id="getFriendsEntity" resultType="cn.queue.domain.entity.FriendsEntity">
+        select id, from_id,to_id,remark,black,status,create_time,extra from friends where from_id = #{fromId} and to_id = #{toId}
+    </select>
+</mapper>
