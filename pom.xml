@@ -23,6 +23,7 @@
         <module>Queue-file</module>
         <module>Queue-base</module>
         <module>Queue-online-judge</module>
+        <module>Queue-im-consumer</module>
     </modules>
 
     <properties>
@@ -131,6 +132,8 @@
                 <artifactId>rocketmq-spring-boot-starter</artifactId>
                 <version>${rocketmq-spring-boot-starter.version}</version>
             </dependency>
+
+
 
         </dependencies>
     </dependencyManagement>

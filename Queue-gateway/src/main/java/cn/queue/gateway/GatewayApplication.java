@@ -11,6 +11,7 @@ import org.springframework.core.env.Environment;
 @ComponentScan("cn.queue")
 public class GatewayApplication {
 
+
     private static final Logger LOG = LoggerFactory.getLogger(GatewayApplication.class);
 
     public static void main(String[] args) {

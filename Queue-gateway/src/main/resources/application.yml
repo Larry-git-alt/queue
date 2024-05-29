@@ -16,6 +16,10 @@ spring:
           uri: lb://judge
           predicates:
             - Path=/judge/**
+        - id: im-core
+          uri: http://localhost:9000
+          predicates:
+            - Path=/im-core/**
       globalcors:
         cors-configurations:
           '[/**]':

@@ -33,3 +33,5 @@ build/
 .vscode/
 /nacos/
 /log/**/*.log
+/log/gateway/
+/log/
