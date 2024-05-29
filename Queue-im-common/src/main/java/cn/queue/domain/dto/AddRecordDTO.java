@@ -21,18 +21,12 @@ public class AddRecordDTO {
 
     private Long toId;
 
-    private String username;
+    private Integer status;
 
     private String note;
 
-    private Integer status;
-    //头像
-    private String photo;
-    //判断是申请的还是被申请的 1 是申请 0 是被申请
-    private Integer type;
+    private String remark;
 
     private Date createTime;
-
-    private Date updateTime;
 
 }

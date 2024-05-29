@@ -3,7 +3,8 @@ package cn.queue.imcore.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.queue.base.user.domain.entity.User;
 import cn.queue.common.util.RedisUtil;
-import cn.queue.domain.valueObj.CacheConstant;
+import cn.queue.domain.dto.AddRecordDTO;
+import cn.queue.domain.valueObj.FriendShipErrorCode;
 import cn.queue.domain.vo.FriendVO;
 import cn.queue.domain.entity.AddRecordEntity;
 import cn.queue.domain.entity.ClazzEntity;
@@ -16,10 +17,9 @@ import cn.queue.imcore.dao.IFriendsDao;
 import cn.queue.imcore.feign.UserFeign;
 import cn.queue.imcore.service.IFriendsService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,8 +49,6 @@ public class FriendsServiceImpl implements IFriendsService {
     private AddListCache addListCache;
     @Resource
     private IClazzDao clazzDao;
-//    @Resource
-//    private RedisTemplate<String, AddRecordVO> redisTemplate;
 
     @Override
     public List<FriendsEntity> getList(Long id) {
@@ -62,14 +60,17 @@ public class FriendsServiceImpl implements IFriendsService {
     /**
      * 发起好友申请
      *
-     * @param fromId
-     * @param toId
-     * @param note
      */
     @Override
     @Transactional
-    public String addFriend(Long fromId, Long toId, String note) {
+    public String addFriend(AddRecordDTO addRecordDTO) {
+        Long fromId = addRecordDTO.getFromId();
+        Long toId = addRecordDTO.getToId();
+        String note = addRecordDTO.getNote();
+        String remark = addRecordDTO.getRemark();
+        remark = remark == null ? userFeign.getById(toId).getUsername() : remark;
 
+        FriendShipErrorCode.FRIEND_IS_BLACK.getError();
         //不能添加自己为好友
         if (fromId.equals(toId)) {
             return "不能添加自己为好友";
@@ -307,7 +308,7 @@ public class FriendsServiceImpl implements IFriendsService {
         });
         //根据时间排序
         List<AddRecordVO> collect = addRecordVOS.stream()
-                .sorted(Comparator.comparing(AddRecordVO::getCreateTime))
+                .sorted(Comparator.nullsLast(Comparator.comparing(AddRecordVO::getCreateTime)))
                 .collect(Collectors.toList());
         collect.forEach(addDTO->{
             addListCache.addToApplyList(addDTO, id);
@@ -417,6 +418,10 @@ public class FriendsServiceImpl implements IFriendsService {
         listLambdaQueryWrapper.eq(FriendsEntity::getFromId, id).eq(FriendsEntity::getClazzId, clazzId);
         List<FriendsEntity> friendsEntities = friendsDao.selectList(listLambdaQueryWrapper);
 
+        if(friendsEntities == null){
+            return null;
+        }
+
         List<FriendVO> friendVOS = new ArrayList<>();
         friendsEntities.forEach(friendsEntity -> {
             FriendVO friendVO = new FriendVO();
@@ -430,8 +435,38 @@ public class FriendsServiceImpl implements IFriendsService {
         //根据备注排序
 
         return friendVOS.stream()
-                .sorted(Comparator.comparing(FriendVO::getRemark))
+                .sorted(Comparator.nullsLast(Comparator.comparing(FriendVO::getRemark)))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 分页查询好友列表
+     * @param id
+     * @param page
+     * @param size
+     * @return
+     */
+    @Override
+    public List<FriendVO> queryPageFriend(Long id, Integer page, Integer size){
+
+        Page<FriendsEntity> pag = new Page<>(page, size);
+        LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FriendsEntity::getFromId, id)
+                .orderByAsc(FriendsEntity::getRemark);
+
+        Page<FriendsEntity> selectPage = friendsDao.selectPage(pag, queryWrapper);
+        System.err.println(selectPage.getRecords());
+        List<FriendVO> friendsVOS =
+        selectPage.getRecords().stream().map(friendsEntity -> {
+            FriendVO friendVO = new FriendVO();
+            friendVO.setFriendId(friendsEntity.getToId());
+            friendVO.setRemark(friendsEntity.getRemark());
+            friendVO.setPhoto(friendsEntity.getPhoto());
+            return friendVO;
+        }).sorted(Comparator.nullsLast(Comparator.comparing(FriendVO::getRemark)))
+                .collect(Collectors.toList());
+
+        return friendsVOS;
     }
 
     /**
@@ -498,7 +533,9 @@ public class FriendsServiceImpl implements IFriendsService {
         //判断两人的好友状态
         FriendsEntity friends = friendsDao.selectOne(queryWrapper);
         if (friends.getStatus() == 2) {
-            return "已经是拉黑状态";
+            friends.setBlack(1);
+            friendsDao.update(friends, queryWrapper);
+            return "解除拉黑状态";
         }
         //设置black为2
         friends.setBlack(2);

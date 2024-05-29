@@ -1,6 +1,7 @@
 package cn.queue.imcore.service;
 
 
+import cn.queue.domain.dto.AddRecordDTO;
 import cn.queue.domain.entity.FriendsEntity;
 import cn.queue.domain.vo.AddRecordVO;
 import cn.queue.domain.vo.FriendVO;
@@ -15,7 +16,7 @@ import java.util.List;
 public interface IFriendsService  {
     List<FriendsEntity> getList(Long id);
 
-    String addFriend(Long fromId, Long toId, String note);
+    String addFriend(AddRecordDTO addRecordDTO);
 
     String receiveAdd(Long fromId, Long toId, Integer status);
 
@@ -30,6 +31,8 @@ public interface IFriendsService  {
     String setFriendsClazz(Long fromId, Long toId, Long clazzId);
 
     List<FriendVO> queryFriendByClazz(Long id, Integer clazzId);
+
+    List<FriendVO> queryPageFriend(Long id, Integer page, Integer size);
 
     String setRemark(Long fromId, Long toId, String remark);
 
