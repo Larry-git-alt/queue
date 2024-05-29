@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.queue.online_judge.mapper.ProblemMapper">
+
+    <!-- 新增题目   -->
+<!--    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">-->
+<!--        insert into problem(title,content,time_limit,memory_limit,difficulty,tags,input_format,output_format,`range`,languages)-->
+<!--                    values (#{title},#{content},#{timeLimit},#{memoryLimit},#{difficulty},#{tags},#{inputFormat},#{outputFormat},#{range},#{languages})-->
+<!--    </insert>-->
+
+    <!--    修改题目-->
+    <update id="update">
+        update problem
+        <set>
+            <if test="title != null and title != ''"> title = #{title}, </if>
+            <if test="content != null and content != ''"> content = #{content}, </if>
+            <if test="timeLimit != null"> time_limit = #{timeLimit}, </if>
+            <if test="memoryLimit != null"> memory_limit = #{memoryLimit}, </if>
+            <if test="stackLimit != null"> stack_limit = #{stackLimit}, </if>
+            <if test="difficulty != null"> difficulty = #{difficulty}, </if>
+            <if test="tags != null and tags != ''"> tags = #{tags}, </if>
+            <if test="inputFormat != null and inputFormat != ''"> input_format = #{inputFormat}, </if>
+            <if test="outputFormat != null and outputFormat != ''"> output_format = #{outputFormat}</if>
+            <if test="range != null and range != ''"> `range` = #{range}</if>
+            <if test="languages != null and languages != ''"> languages = #{languages}</if>
+            <if test="updateTime != null"> update_time = #{updateTime} </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 批量删除题目  -->
+    <delete id="delete">
+        delete
+        from problem
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <!--根据标签查询题目   -->
+<!--    <select id="getByTag" resultType="cn.queue.online_judge.pojo.Problem">-->
+<!--         select *-->
+<!--         from problem-->
+<!--         <where>-->
+<!--              <if test="tags != null and tags != '' ">-->
+<!--                  tags like concat('%',#{tags},'%')-->
+<!--              </if>-->
+<!--         </where>-->
+<!--    </select>-->
+
+    <!--根据标题查询题目   -->
+<!--    <select id="getByTitle" resultType="cn.queue.online_judge.pojo.Problem">-->
+<!--        select *-->
+<!--        from problem-->
+<!--        <where>-->
+<!--            <if test="title != null and title != '' ">-->
+<!--                title like concat('%',#{title},'%')-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
+
+
+
+    <!-- 分页查询   -->
+    <select id="list" resultType="cn.queue.online_judge.pojo.Problem">
+        select *
+        from problem
+        <where>
+            <if test="tags != null and tags != '' ">
+                tags like concat('%',#{tags},'%')
+            </if>
+            <if test="title != null and title != '' ">
+                and title like concat('%',#{title},'%')
+            </if>
+           <if test="difficulty != null">
+               and difficulty = #{difficulty}
+           </if>
+        </where>
+    </select>
+
+</mapper>
