@@ -1,5 +1,6 @@
 package cn.queue.imcore.controller;
 
+import cn.queue.cache.ChannelHandlerContextCache;
 import cn.queue.common.annnotation.LarryController;
 import cn.queue.domain.dto.CreateConversationReq;
 import cn.queue.domain.dto.GetMessageDTO;
@@ -12,11 +13,13 @@ import cn.queue.imcore.dao.ImConversationSetMapper;
 import cn.queue.imcore.repository.SessionRepository;
 import cn.queue.imcore.service.ConversationService;
 import cn.queue.imcore.service.IMessageService;
+import io.netty.channel.ChannelHandlerContext;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author: Larry
@@ -32,18 +35,20 @@ public class MessageController {
     @Resource
     private SessionRepository sessionRepository;
     @GetMapping("/getMessage")
-    public List<ImMsgEntity> imMsgEntities(){
-        GetMessageDTO getMessageDTO = new GetMessageDTO();
-        getMessageDTO.setTargetId(312121212123L);
-        getMessageDTO.setUserId(111122221212L);
-        getMessageDTO.setCode(1003);
-        getMessageDTO.setPageNum(1L);
-        getMessageDTO.setPageSize(2L);
-       return messageService.getHistoryMessage(getMessageDTO);
+    public List<ImMsgEntity> imMsgEntities(GetMessageDTO messageDTO){
+        System.out.println(messageDTO.toString());
+        System.out.println(messageDTO.getPageNum());
+        System.out.println(messageDTO.getPageSize());
+        return messageService.getHistoryMessage(messageDTO);
     }
     @GetMapping("/session")
-    public List<SessionVO> getSessionVo(){
-      return sessionRepository.getSessionVOList(3333L);
+    public List<SessionVO> getSessionVo(Long userId){
+      return sessionRepository.getSessionVOList(userId);
+    }
+    @GetMapping("/session2")
+    public List<SessionVO> getSessionVo2(Long userId){
+        CompletableFuture<List<SessionVO>> sessionFuture = sessionRepository.getSession(userId);
+        return sessionFuture.join();
     }
     @PostMapping("/test")
     public void set(){

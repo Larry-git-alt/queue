@@ -35,10 +35,26 @@ public class UserSequenceRepository {
         String key = Constants.RedisConstants.SeqPrefix + userId;
         System.out.println(key);
         System.out.println(conversationId);
-        System.out.println(redisTemplate.opsForHash().get(key,conversationId));
-        Integer test = (Integer) redisTemplate.opsForHash().get(key,conversationId);
-        long longValue = test.longValue();
-        return longValue;
+
+        Object value = redisTemplate.opsForHash().get(key, conversationId);
+        System.out.println(value);
+
+        if (value == null) {
+            // 如果value为空，则返回0
+            return 0;
+        }
+
+        try {
+            // 尝试将获取的值转换为Integer
+            Integer test = (Integer) value;
+            // 将Integer转换为long
+            long longValue = test.longValue();
+            return longValue;
+        } catch (ClassCastException e) {
+            // 如果转换失败，返回0或处理异常
+            System.err.println("ClassCastException: " + e.getMessage());
+            return 0;
+        }
     }
 
 }
