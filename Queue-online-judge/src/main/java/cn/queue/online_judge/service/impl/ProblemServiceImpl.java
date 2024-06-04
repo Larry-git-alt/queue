@@ -48,7 +48,7 @@ public class ProblemServiceImpl implements ProblemService {
 //    }
 
     @Override
-    public Problem getById(Integer id) {
+    public Problem getById(Long id) {
         Problem problem = problemMapper.getById(id);
         List<Example> examples = exampleMapper.getById(id);
         problem.setExamples(examples);
@@ -66,7 +66,7 @@ public class ProblemServiceImpl implements ProblemService {
 //    }
 
     @Override
-    public void delete(List<Integer> ids) {
+    public void delete(List<Long> ids) {
         problemMapper.deleteBatchIds(ids);
     }
 
@@ -90,10 +90,14 @@ public class ProblemServiceImpl implements ProblemService {
 
         //2、执行查询
         List<Problem> empList = problemMapper.list(tags,title,difficulty);
+
+        Long userId = 1L;
+
+
         Page<Problem> p = (Page<Problem>) empList;
 
         //3、封装PageBean对象
-        PageBean pageBean = new PageBean(p.getTotal(),p.getResult());
+        PageBean pageBean = new PageBean((int)p.getTotal(),p.getResult());
         return pageBean;
     }
 }

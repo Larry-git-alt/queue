@@ -20,7 +20,7 @@ public class AnswerServiceImpl implements AnswerService {
    private AnswerMapper answerMapper;
 
     @Override
-    public Answer getByAnsId(Integer id) {
+    public Answer getByAnsId(Long id) {
         LambdaQueryWrapper<Answer> lqw = new LambdaQueryWrapper<>();
         lqw.eq(Answer::getId,id);
         Answer answer = answerMapper.selectOne(lqw);
@@ -29,7 +29,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public PageBean page(Integer page, Integer pageSize, Integer userId, Integer proId) {
+    public PageBean page(Integer page, Integer pageSize, Long userId, Long proId) {
         //1、设置分页参数
         PageHelper.startPage(page,pageSize);
 
@@ -38,7 +38,7 @@ public class AnswerServiceImpl implements AnswerService {
         Page<Answer> a = (Page<Answer>) ansList;
 
         //3、封装PageBean对象
-        PageBean pageBean = new PageBean(a.getTotal(),a.getResult());
+        PageBean pageBean = new PageBean((int) a.getTotal(),a.getResult());
         return pageBean;
     }
 

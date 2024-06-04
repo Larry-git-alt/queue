@@ -31,5 +31,5 @@ public interface ExampleMapper {
      * @return
      */
     @Select("select * from example where problem_id = #{id}")
-    List<Example> getById(Integer id);
+    List<Example> getById(Long id);
 }

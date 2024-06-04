@@ -19,7 +19,7 @@ public class ModuleController {
     private ModuleService moduleService;
 
     @GetMapping("/{id}")
-    public CommonResult getById(@PathVariable Integer id){
+    public CommonResult getById(@PathVariable Long id){
         log.info("根据id查询模块,id:{}",id);
         Module module = moduleService.getById(id);
         return CommonResult.success(module);

@@ -12,7 +12,7 @@ import java.util.List;
 public interface CourseMapper extends BaseMapper<Course> {
 
    @Select("select * from course where id = #{id} and deleted = 0")
-    Course getById(Integer id);
+    Course getById(Long id);
 
    @Select("select * from course")
     List<Course> list();

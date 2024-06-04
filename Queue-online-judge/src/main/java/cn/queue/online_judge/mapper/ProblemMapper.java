@@ -30,7 +30,7 @@ public interface ProblemMapper extends BaseMapper<Problem>{
      * @return
      */
     @Select("select * from problem where id = #{id}")
-    Problem getById(Integer id);
+    Problem getById(Long id);
 
     /**
      * 根据标题查询题目

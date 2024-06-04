@@ -21,7 +21,7 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
     @GetMapping("/{id}")
-    public CommonResult getById(@PathVariable Integer id){
+    public CommonResult getById(@PathVariable Long id){
         log.info("根据id查询课程,id:{}",id);
         Course course = courseService.getById(id);
 
@@ -31,7 +31,7 @@ public class CourseController {
 
     @PostMapping("/create")
     public CommonResult create(@RequestBody Course course){
-        log.info("新增课程,module:{}",course);
+        log.info("新增课程,course:{}",course);
         courseService.create(course);
         return CommonResult.success();
     }
@@ -45,5 +45,20 @@ public class CourseController {
         PageBean pageBean = courseService.page(page,pageSize);
         return CommonResult.success(pageBean);
     }
+
+
+    @PostMapping
+    public CommonResult unlockCourse(Long courseId,Long userId){
+        log.info("解锁课程,courseId:{},userId:{}",courseId,userId);
+        boolean isSuccess = courseService.unlockCourse(courseId,userId);
+        if (isSuccess){
+            return CommonResult.success();
+        }
+        else {
+            return CommonResult.fail("解锁失败");
+        }
+
+    }
+
 
 }

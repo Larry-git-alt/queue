@@ -36,7 +36,7 @@ public class ProblemController {
 //    }
 
     @GetMapping("/{id}")
-    public CommonResult getById(@PathVariable Integer id){
+    public CommonResult getById(@PathVariable Long id){
         log.info("根据id查询题目,id:{}",id);
         Problem problem = problemService.getById(id);
         return CommonResult.success(problem);
@@ -68,7 +68,7 @@ public class ProblemController {
 //    }
 
     @DeleteMapping("/{ids}")
-    public CommonResult delete(@PathVariable List<Integer> ids){
+    public CommonResult delete(@PathVariable List<Long> ids){
         log.info("批量删除操作,ids:{}",ids);
         problemService.delete(ids);
         return CommonResult.success();

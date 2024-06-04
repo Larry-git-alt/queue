@@ -13,10 +13,10 @@ import java.util.List;
 public interface RelationMapper extends BaseMapper<Relation> {
 
    @Select("select problem_id from relation where module_id = #{id} and problem_id is not null")
-    List<Integer> getByMoId(Integer id);
+    List<Long> getByMoId(Long id);
 
     @Select("select module_id from relation where type = 0 and type_id = #{id} and module_id is not null")
-    List<Integer> getByCoId(Integer id);
+    List<Long> getByCoId(Long id);
 
     /**
      * 新增模块

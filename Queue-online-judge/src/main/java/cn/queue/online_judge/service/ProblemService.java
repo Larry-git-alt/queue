@@ -25,7 +25,7 @@ public interface ProblemService {
       * @param id
      * @return
      */
-    Problem getById(Integer id);
+    Problem getById(Long id);
 
     /**
      * 根据标题查询题目
@@ -45,7 +45,7 @@ public interface ProblemService {
      * 批量删除
      * @param ids
      */
-    void delete(List<Integer> ids);
+    void delete(List<Long> ids);
 
     /**
      * 修改题目

@@ -15,5 +15,5 @@ public interface AnswerMapper extends BaseMapper<Answer> {
      * @param proId
      * @return
      */
-    List<Answer> list(Integer userId, Integer proId);
+    List<Answer> list(Long userId, Long proId);
 }

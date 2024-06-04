@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Answer {
-    private long id;//主键id
-    private long userId;//用户id
-    private long proId;//题目id
+    private Long id;//主键id
+    private Long userId;//用户id
+    private Long proId;//题目id
     private LocalDateTime submissionTime;//提交时间
     private String status;//提交状态
     private Integer runtime;//运行时间

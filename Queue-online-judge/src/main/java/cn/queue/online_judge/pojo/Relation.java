@@ -13,4 +13,5 @@ public class Relation {
     private Long typeId;//类型ID
     private Integer type;//类型
     private Long moduleId;//模块id
+    private Long userId;//用户id
 }

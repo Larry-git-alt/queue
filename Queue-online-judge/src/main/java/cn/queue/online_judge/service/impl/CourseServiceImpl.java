@@ -31,15 +31,15 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private RelationMapper relationMapper;
     @Override
-    public Course getById(Integer id) {
+    public Course getById(Long id) {
         Course course = courseMapper.getById(id);
-        List<Integer> modulesIds = relationMapper.getByCoId(id);
+        List<Long> modulesIds = relationMapper.getByCoId(id);
         //HashSet<Integer> newModulesIds = new HashSet<>(modulesIds);
         List<Module> modules = new ArrayList<>();
 
         //modulesIds.forEach(m -> modules.add(moduleMapper.getById(m)));
 
-        for (Integer m : modulesIds) {
+        for (Long m : modulesIds) {
             modules.add(moduleMapper.getById(m));
         }
 
@@ -72,8 +72,26 @@ public class CourseServiceImpl implements CourseService {
         Page<Course> c = (Page<Course>) courseList;
 
         //3、封装PageBean对象
-        PageBean pageBean = new PageBean(c.getTotal(),c.getResult());
+        PageBean pageBean = new PageBean((int)c.getTotal(),c.getResult());
         return pageBean;
+    }
+
+    @Override
+    public boolean unlockCourse(Long courseId, Long userId) {
+        if (true)
+        //todo
+        {
+            Relation relation = new Relation();
+            relation.setType(0);
+            relation.setTypeId(courseId);
+            relation.setUserId(userId);
+            relationMapper.insert(relation);
+            log.info("success");
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 

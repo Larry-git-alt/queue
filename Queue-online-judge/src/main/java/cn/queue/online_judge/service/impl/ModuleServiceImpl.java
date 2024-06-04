@@ -28,12 +28,12 @@ public class ModuleServiceImpl implements ModuleService {
     private ProblemMapper problemMapper;
 
     @Override
-    public Module getById(Integer id) {
+    public Module getById(Long id) {
         Module module = moduleMapper.getById(id);
-        List<Integer> problemIds = relationMapper.getByMoId(id);
+        List<Long> problemIds = relationMapper.getByMoId(id);
         //HashSet<Integer> newProblemIds = new HashSet<>(problemIds);
         List<Problem> problems = new ArrayList<>();
-        for (Integer p : problemIds) {
+        for (Long p: problemIds) {
             problems.add(problemMapper.getById(p));
         }
         module.setProblems(problems);

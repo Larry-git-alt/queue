@@ -4,9 +4,9 @@ import cn.queue.online_judge.pojo.Answer;
 import cn.queue.online_judge.pojo.PageBean;
 
 public interface AnswerService {
-    Answer getByAnsId(Integer id);
+    Answer getByAnsId(Long id);
 
-    PageBean page(Integer page, Integer pageSize, Integer userId, Integer proId);
+    PageBean page(Integer page, Integer pageSize, Long userId, Long proId);
 
     void create(Answer answer);
 }

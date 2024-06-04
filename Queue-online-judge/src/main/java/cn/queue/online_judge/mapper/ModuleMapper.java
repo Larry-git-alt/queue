@@ -13,8 +13,8 @@ public interface ModuleMapper extends BaseMapper<Module> {
 //    List<Module> getMoById(Integer id);
 
     @Select("select * from module where course_id = #{id} and deleted = 0")
-    List<Module> getByCoId(Integer id);
+    List<Module> getByCoId(Long id);
 
     @Select("select * from module where id = #{id} and deleted = 0")
-    Module getById(Integer id);
+    Module getById(Long id);
 }

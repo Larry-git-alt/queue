@@ -18,7 +18,7 @@ public class AnswerController {
     private AnswerService answerService;
 
     @GetMapping("/{id}")
-    public CommonResult getByAnsId(@PathVariable Integer id){
+    public CommonResult getByAnsId(@PathVariable Long id){
         log.info("根据题解id查询题解,id:{}",id);
         Answer answer = answerService.getByAnsId(id);
 
@@ -29,8 +29,8 @@ public class AnswerController {
     @GetMapping
     public CommonResult page(@RequestParam(defaultValue = "1") Integer page,
                              @RequestParam(defaultValue = "10") Integer pageSize,
-                             @RequestParam(value = "userId",required = false) Integer userId,
-                             @RequestParam(value = "proId",required = false) Integer proId){
+                             @RequestParam(value = "userId",required = false) Long userId,
+                             @RequestParam(value = "proId",required = false) Long proId){
         log.info("分页查询，参数：{},{},{},{}",page,pageSize,userId,proId);
         //调用service分页查询
         PageBean pageBean = answerService.page(page,pageSize,userId,proId);
