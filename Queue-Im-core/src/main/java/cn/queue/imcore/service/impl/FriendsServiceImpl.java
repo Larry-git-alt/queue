@@ -17,13 +17,9 @@ import cn.queue.imcore.dao.IFriendsDao;
 import cn.queue.imcore.feign.UserFeign;
 import cn.queue.imcore.service.IFriendsService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,6 +102,7 @@ public class FriendsServiceImpl implements IFriendsService {
                 .toId(toId)
                 .status(1)
                 .note(note)
+                .remark(remark)
                 .createTime(new Date())
                 .build();
         applyDao.insert(addRecordEntity);
@@ -174,6 +171,7 @@ public class FriendsServiceImpl implements IFriendsService {
         if (friends != null && toFriends != null) {
             friends.setStatus(1);
             friends.setBlack(1);
+            friends.setRemark(addRecordEntity.getRemark());
             toFriends.setStatus(1);
             toFriends.setBlack(1);
             friendsDao.update(toFriends, eq);
@@ -185,7 +183,7 @@ public class FriendsServiceImpl implements IFriendsService {
                     .toId(toId)
                     .status(1)
                     .black(1)
-                    .remark(userFeign.getById(toId).getUsername())
+                    .remark(addRecordEntity.getRemark())
                     .createTime(new Date())
                     .build();
             friendsDao.insert(friendsEntity);
@@ -283,8 +281,8 @@ public class FriendsServiceImpl implements IFriendsService {
 
         List<AddRecordEntity> beList = applyDao.selectList(toQueryWrapper);
         List<AddRecordVO> addRecordVOS = new ArrayList<>();
-        AddRecordVO addRecordVO = new AddRecordVO();
         beList.forEach(addRecordEntity -> {
+            AddRecordVO addRecordVO = new AddRecordVO();
             BeanUtil.copyProperties(addRecordEntity, addRecordVO);
             User fromUser = userFeign.getById(addRecordEntity.getFromId());
             addRecordVO.setPhoto(fromUser.getImg());
@@ -300,8 +298,11 @@ public class FriendsServiceImpl implements IFriendsService {
                 .eq(AddRecordEntity::getFromId, id);
         List<AddRecordEntity> list = applyDao.selectList(queryWrapper);
         list.forEach(addRecordEntity -> {
+            AddRecordVO addRecordVO = new AddRecordVO();
             BeanUtil.copyProperties(addRecordEntity, addRecordVO);
             User toUser = userFeign.getById(addRecordEntity.getToId());
+            //TODO:查不到user信息
+            log.info("~~~~~~~~~~~~~~~~~~~~~{}", addRecordEntity.getToId());
             addRecordVO.setPhoto(toUser.getImg());
             addRecordVO.setUpdateTime(new Date());
             addRecordVO.setType(1);
@@ -310,13 +311,15 @@ public class FriendsServiceImpl implements IFriendsService {
             //放入redis缓存
             //addListCache.addToApplyList(addRecordDTO, id);
         });
+
+
         //根据时间排序
         List<AddRecordVO> collect = addRecordVOS.stream()
                 .sorted(Comparator.nullsLast(Comparator.comparing(AddRecordVO::getCreateTime)))
                 .collect(Collectors.toList());
-        collect.forEach(addDTO->{
-            addListCache.addToApplyList(addDTO, id);
-        });
+//        collect.forEach(addDTO->{
+//            addListCache.addToApplyList(addDTO, id);
+//        });
         return collect;
     }
 
@@ -457,8 +460,8 @@ public class FriendsServiceImpl implements IFriendsService {
         LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FriendsEntity::getFromId, id)
                 .orderByAsc(FriendsEntity::getRemark);
-        IPage<FriendsEntity> friendsPage = friendsDao.selectPage(page, queryWrapper);
-        System.out.println(friendsPage.getRecords());
+        Page<FriendsEntity> friendsPage = friendsDao.selectPage(page, queryWrapper);
+
         // 转换数据
         List<FriendVO> friendsVOS = friendsPage.getRecords().stream()
                 .map(friendsEntity -> {

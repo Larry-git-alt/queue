@@ -30,6 +30,8 @@ public class AddRecordVO {
     //判断是申请的还是被申请的 1 是申请 0 是被申请
     private Integer type;
 
+    private Integer isOnline;
+
     private Date createTime;
 
     private Date updateTime;
