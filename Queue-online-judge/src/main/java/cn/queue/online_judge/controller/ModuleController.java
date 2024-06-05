@@ -31,4 +31,14 @@ public class ModuleController {
         moduleService.create(module);
         return CommonResult.success();
     }
+
+
+    @GetMapping("all")
+    public CommonResult getAll(){
+        log.info("查询所有模块");
+        List<Module> modules = moduleService.getAll();
+        return CommonResult.success(modules);
+    }
+
+
 }

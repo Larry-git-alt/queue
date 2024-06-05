@@ -8,5 +8,8 @@ public class ThreadConstant {
     // 异常原因
     public static final String JUDGER_ERROR = "测评机异常, 请联系管理员";
 
+    //比赛
+    public static final String COM_ERROR = "比赛已经结束";
+
 
 }

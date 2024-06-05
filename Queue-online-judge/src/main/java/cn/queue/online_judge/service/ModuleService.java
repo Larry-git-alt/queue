@@ -9,4 +9,7 @@ public interface ModuleService {
 
 
     void create(Module module);
+
+
+    List<Module> getAll();
 }

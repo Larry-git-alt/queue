@@ -6,4 +6,6 @@ public interface JudgeService {
 
 
     void normalJudge(QuestionPack questionPack);
+
+    void comJudge(QuestionPack questionPack,Long comId);
 }

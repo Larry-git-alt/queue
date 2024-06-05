@@ -15,7 +15,7 @@ public class ComRank {
     private Long userId;//用户id
     private Long comId;//比赛id
     private Integer totalScore;//总得分
-    private Integer totalTime;//总用时
+    private String totalTime;//总用时
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;//更新时间
 }

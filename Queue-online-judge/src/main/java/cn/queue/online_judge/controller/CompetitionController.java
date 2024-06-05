@@ -3,13 +3,21 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.queue.common.annnotation.LarryController;
 import cn.queue.common.domain.CommonResult;
 import cn.queue.online_judge.dto.CompetitionDTO;
+import cn.queue.online_judge.pojo.ComRank;
 import cn.queue.online_judge.pojo.Competition;
 import cn.queue.online_judge.pojo.PageBean;
+import cn.queue.online_judge.service.ComRankService;
 import cn.queue.online_judge.service.CommonService;
 import cn.queue.online_judge.service.CompetitionService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+import static cn.queue.online_judge.constant.ThreadConstant.COM_ERROR;
 
 
 @Slf4j
@@ -20,6 +28,9 @@ public class CompetitionController {
     private CompetitionService competitionService;
     @Autowired
     private CommonService commonService;
+    @Autowired
+    private ComRankService comRankService;
+
 
 
 
@@ -53,6 +64,8 @@ public class CompetitionController {
             if (isCode) {
                 // 如果邀请码有效，则解锁比赛
                 competitionService.unlockCom(comId, userId);
+                //解锁成功后加入比赛排名
+                comRankService.create(comId,userId);
                 return CommonResult.success();
             } else {
                 // 如果邀请码无效，返回失败结果
@@ -72,10 +85,48 @@ public class CompetitionController {
             return CommonResult.success();
         }
         else {
-            return CommonResult.fail("比赛已结束");
+            return CommonResult.fail(COM_ERROR);
         }
 
     }
+
+    @Test
+    public void test() throws InterruptedException {
+        LocalDateTime now = LocalDateTime.now();
+
+        Thread.sleep(1000);
+        LocalDateTime now3 = LocalDateTime.now();
+
+        long hour = ChronoUnit.HOURS.between(now, now3);
+        long minute = ChronoUnit.MINUTES.between(now, now3);
+        long seconds = ChronoUnit.SECONDS.between(now, now3);
+
+        String result = hour + "h" + minute + "min" + seconds + "s";
+
+        System.out.println(result);
+    }
+
+    @GetMapping("/time")
+    public CommonResult time(Long comId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime end = competitionService.time(comId);
+
+        System.out.println(end);
+
+        // 计算当前时间和结束时间之间的秒数差
+        long diff = ChronoUnit.SECONDS.between(now,end);
+        return CommonResult.success(diff);
+
+    }
+
+
+    @PostMapping("/submit")
+    public CommonResult submit(Long comId,Long userId){
+        competitionService.submit(comId,userId);
+        return CommonResult.success();
+    }
+
+
 
 
 

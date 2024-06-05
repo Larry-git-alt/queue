@@ -1,13 +1,14 @@
 package cn.queue.online_judge.mapper;
 
 import cn.queue.online_judge.pojo.ComRank;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
 @Mapper
-public interface ComRankMapper {
+public interface ComRankMapper extends BaseMapper<ComRank> {
     /**
      * 根据比赛id排行
      * @param comId

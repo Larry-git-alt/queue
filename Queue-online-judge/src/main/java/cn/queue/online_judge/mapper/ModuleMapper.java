@@ -17,4 +17,6 @@ public interface ModuleMapper extends BaseMapper<Module> {
 
     @Select("select * from module where id = #{id} and deleted = 0")
     Module getById(Long id);
+    @Select("select * from module")
+    List<Module> getAll();
 }
