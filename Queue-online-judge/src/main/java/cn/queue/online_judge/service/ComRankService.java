@@ -9,4 +9,6 @@ public interface ComRankService {
 //    List<ComRank> rankByComId(Long comId);
 
     PageBean page(Integer page, Integer pageSize, Long comId);
+
+    void create(Long comId, Long userId);
 }

@@ -10,4 +10,6 @@ public interface JudgeService {
     void normalJudge(QuestionPack questionPack);
 
     DebugResult debug(DebugDTO debugDTO);
+
+    void comJudge(QuestionPack questionPack,Long comId);
 }

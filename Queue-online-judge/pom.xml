@@ -51,6 +51,10 @@
             <artifactId>druid</artifactId>
             <version>1.2.20</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 
         <!--PageHelper分页插件       -->
 <!--        <dependency>-->

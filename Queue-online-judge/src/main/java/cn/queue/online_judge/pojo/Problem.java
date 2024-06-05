@@ -45,4 +45,6 @@ public class Problem extends BaseEntity{
      @TableField(exist = false)
      private List<Example> examples;
   //   @TableLogic(value = "0", delval = "1")
+     @TableField(exist = false)
+     private String status;
 }

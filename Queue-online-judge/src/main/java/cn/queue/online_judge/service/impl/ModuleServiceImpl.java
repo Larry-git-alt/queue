@@ -56,5 +56,20 @@ public class ModuleServiceImpl implements ModuleService {
         }
     }
 
+    @Override
+    public List<Module> getAll() {
+        List<Module> modules =  moduleMapper.getAll();
+        for (Module module : modules) {
+            List<Long> problemIds = relationMapper.getByMoId(module.getId());
+            List<Problem> problems = new ArrayList<>();
+            for (Long p: problemIds) {
+                problems.add(problemMapper.getById(p));
+            }
+            module.setProblems(problems);
+        }
+       return modules;
+
+    }
+
 
 }

@@ -1,12 +1,10 @@
 package cn.queue.online_judge.service.impl;
 
 import cn.queue.common.domain.CommonResult;
+import cn.queue.online_judge.mapper.ComRankMapper;
 import cn.queue.online_judge.mapper.CompetitionMapper;
 import cn.queue.online_judge.mapper.RelationMapper;
-import cn.queue.online_judge.pojo.Competition;
-import cn.queue.online_judge.pojo.Course;
-import cn.queue.online_judge.pojo.PageBean;
-import cn.queue.online_judge.pojo.Relation;
+import cn.queue.online_judge.pojo.*;
 import cn.queue.online_judge.service.CompetitionService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +25,9 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
 
    @Autowired
    private RelationMapper relationMapper;
+
+   @Autowired
+   private ComRankMapper comRankMapper;
 
 
     @Override
@@ -74,5 +76,32 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
         relationMapper.insert(relation);
 
 
+    }
+
+    @Override
+    public LocalDateTime time(Long comId) {
+        LambdaQueryWrapper<Competition> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Competition::getId,comId);
+        Competition competition = competitionMapper.selectOne(lqw);
+        return competition.getEndTime();
+    }
+
+    @Override
+    public void submit(Long comId,Long userId) {
+        LocalDateTime now = LocalDateTime.now();
+        LambdaQueryWrapper<Competition> lqw = new LambdaQueryWrapper<>();
+        Competition competition = competitionMapper.selectOne(lqw.eq(Competition::getId,comId));
+
+        long hour = ChronoUnit.HOURS.between(competition.getStartTime(), now);
+        long minute = ChronoUnit.MINUTES.between(competition.getStartTime(), now);
+        long seconds = ChronoUnit.SECONDS.between(competition.getStartTime(), now);
+
+        String result = hour + "h" + minute + "min" + seconds + "s";
+
+        LambdaQueryWrapper<ComRank> lqwCR = new LambdaQueryWrapper<>();
+        ComRank comRank = comRankMapper.selectOne(lqwCR.eq(ComRank::getComId, comId).eq(ComRank::getUserId, userId));
+        comRank.setTotalTime(result);
+        comRank.setUpdateTime(now);
+        comRankMapper.update(comRank,lqwCR);
     }
 }

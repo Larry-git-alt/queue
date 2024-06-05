@@ -33,4 +33,9 @@ public interface RelationMapper extends BaseMapper<Relation> {
      */
     @Insert("insert into relation(type_id,type,module_id) values (#{courseId},0,#{moduleId})")
     void createCo_Mo(long courseId, Long moduleId);
+
+
+    @Select("select exists(" +
+            "select 1 from relation where user_id = #{userId} and problem_id = #{id})")
+    boolean isPassed(Long userId, Long id);
 }
