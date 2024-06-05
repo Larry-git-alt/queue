@@ -5,6 +5,8 @@ public class ThreadConstant {
     public static final String FREE_STATUS = "free";
     public static final String OCCUPIED_STATUS = "occupied";
 
+    public static  final Integer THRESHOLD = 10;
+
     // 异常原因
     public static final String JUDGER_ERROR = "测评机异常, 请联系管理员";
 

@@ -1,6 +1,7 @@
 package cn.queue.online_judge.controller;
 
 import cn.queue.common.domain.CommonResult;
+import cn.queue.online_judge.dto.DebugDTO;
 import cn.queue.online_judge.pojo.QuestionPack;
 import cn.queue.online_judge.service.JudgeService;
 import jakarta.annotation.Resource;
@@ -19,5 +20,10 @@ public class JudgeController {
     public CommonResult normalJudge(@RequestBody QuestionPack questionPack) {
         judgeService.normalJudge(questionPack);
         return CommonResult.success();
+    }
+
+    @PostMapping("/debug")
+    public CommonResult debugJudge(@RequestBody DebugDTO debugDTO) {
+        return CommonResult.success(judgeService.debug(debugDTO));
     }
 }
