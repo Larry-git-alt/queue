@@ -19,6 +19,8 @@ public class DynamicDTO {
     private Long id;
     private String content;  //内容
     private String url;  //文件链接
+    private Long topicId; //题目id
+    private Long type;  //类型
     private Long pid;  //父动态id
     private Long targetId;  //回复人id
 }

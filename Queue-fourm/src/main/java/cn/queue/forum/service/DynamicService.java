@@ -22,4 +22,6 @@ public interface DynamicService {
     DynamicVO getDynamicById(Long dynamicId);
 
     String deleteDynamicById(Long dynamicId);
+
+
 }

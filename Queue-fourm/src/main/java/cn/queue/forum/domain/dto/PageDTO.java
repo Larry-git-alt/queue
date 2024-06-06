@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class PageDTO {
     private Integer page;
     private Integer size;
+    private Long type;
 }

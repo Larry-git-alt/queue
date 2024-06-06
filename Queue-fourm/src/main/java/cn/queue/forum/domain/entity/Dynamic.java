@@ -23,6 +23,8 @@ public class Dynamic {
     private String url;  //文件链接
     private Long pid;  //父动态id
     private Long targetId;  //回复人id
+    private Long type;  //类型
+    private Long topicId; //题目id
     private Long likes;  //点赞数
     private LocalDateTime createTime;  //创建时间
     private LocalDateTime updateTime;  //更新时间

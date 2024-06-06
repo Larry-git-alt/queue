@@ -11,12 +11,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,17 +51,22 @@ private StringRedisTemplate stringRedisTemplate;
             pid = -1L;
         }
 
+        log.info("dynamicDTO:{}",dynamicDTO);
+
+
         //封装要插入的动态对象
         Dynamic dynamic = Dynamic.builder()
                 .userId(userid)
                 .content(dynamicDTO.getContent())
                 .targetId(dynamicDTO.getTargetId())
                 .url(dynamicDTO.getUrl())
+                .type(dynamicDTO.getType())
                 .likes(0L)
                 .pid(pid)
                 .createTime(LocalDateTime.now())
-                .createBy(userid).build();
-//        log.info("dynamic:{}",dynamic);
+                .createBy(userid)
+                .build();
+        log.info("dynamic:{}",dynamic);
 
         //插入数据
         dynamicMapper.add(dynamic);
@@ -85,56 +87,18 @@ private StringRedisTemplate stringRedisTemplate;
 
         Integer page = pageDTO.getPage();
         Integer size = pageDTO.getSize();
+        Long type = pageDTO.getType();
         //封装分页条件 查询一级动态
         Page<Dynamic> dynamicPage = new Page<>(page,size);
-        Page<Dynamic> dynamicPage1 = dynamicMapper.selectPage(dynamicPage, Wrappers.<Dynamic>lambdaQuery().eq(Dynamic::getPid, -1L).orderByDesc(Dynamic::getCreateTime));
+        Page<Dynamic> dynamicPage1 = dynamicMapper.selectPage(dynamicPage, Wrappers.<Dynamic>lambdaQuery().eq(Dynamic::getPid, -1L).eq(Dynamic::getType, type).orderByDesc(Dynamic::getCreateTime));
 
-        //遍历一级动态 封装为vo
-        for(Dynamic dynamic : dynamicPage1.getRecords()){
+        //调用 封装函数
+        List<DynamicVO> extracted = extracted(dynamicPage1, dynamicVOs);
 
-            //获取发布人信息 todo
-            //User dynamicuser= dynamicMapper.selectById(dynamic.getUserId());
-            UserVO userVO = UserVO.builder()
-                    .userId(114514L)
-                    .nickname("doar")
-                    .img("扣1送地狱火.jpg")
-                    .build();
-
-            //封装vo
-             DynamicVO dynamicVO = DynamicVO.builder()
-                     .id(dynamic.getId())
-                    .userId(dynamic.getUserId())
-                    .content(dynamic.getContent())
-                    .url(dynamic.getUrl())
-                    .pid(dynamic.getPid())
-                    .likes(dynamic.getLikes())
-                    .targetId(dynamic.getTargetId())
-                    .updateTime(dynamic.getUpdateTime())
-                    .createTime(dynamic.getCreateTime())
-                    .createBy(dynamic.getCreateBy())
-                    .userVO(userVO)
-                    .children(new ArrayList<>())
-                    .build();
-
-            //查询当前动态的所有回复  封装children
-            List<DynamicVO> children = dynamicMapper.selectDynamicChildren(dynamic.getId());
-            for (DynamicVO child : children){
-
-                //获取回复发布人信息 todo
-                //User dynamicuser= dynamicMapper.selectById(child.getUserId());
-                UserVO childrenuser = UserVO.builder()
-                        .userId(114514L)
-                        .nickname("doar")
-                        .img("扣1送地狱火.jpg")
-                        .build();
-                child.setUserVO(childrenuser);
-            }
-            dynamicVO.setChildren(children);
-            dynamicVOs.add(dynamicVO);
-        }
-
-        return dynamicVOs;
+        return extracted;
     }
+
+
 
 
     /**
@@ -181,6 +145,7 @@ private StringRedisTemplate stringRedisTemplate;
                 .content(dynamic.getContent())
                 .url(dynamic.getUrl())
                 .pid(dynamic.getPid())
+                .type(dynamic.getType())
                 .targetId(dynamic.getTargetId())
                 .likes(dynamic.getLikes())
                 .updateTime(dynamic.getUpdateTime())
@@ -196,5 +161,62 @@ private StringRedisTemplate stringRedisTemplate;
         return "seccess";
     }
 
+
+
+
+
+    /**
+     * 封装分页数据
+     * @param dynamicPage1 分页数据
+     * @param dynamicVOs 封装后的vo
+     * @return  封装后的vo
+     */
+    private List<DynamicVO> extracted(Page<Dynamic> dynamicPage1, List<DynamicVO> dynamicVOs) {
+        //遍历一级动态 封装为vo
+        for(Dynamic dynamic : dynamicPage1.getRecords()){
+
+            //获取发布人信息 todo
+            //User dynamicuser= dynamicMapper.selectById(dynamic.getUserId());
+            UserVO userVO = UserVO.builder()
+                    .userId(114514L)
+                    .nickname("doar")
+                    .img("扣1送地狱火.jpg")
+                    .build();
+
+            //封装vo
+            DynamicVO dynamicVO = DynamicVO.builder()
+                    .id(dynamic.getId())
+                    .userId(dynamic.getUserId())
+                    .content(dynamic.getContent())
+                    .url(dynamic.getUrl())
+                    .type(dynamic.getType())
+                    .pid(dynamic.getPid())
+                    .likes(dynamic.getLikes())
+                    .targetId(dynamic.getTargetId())
+                    .updateTime(dynamic.getUpdateTime())
+                    .createTime(dynamic.getCreateTime())
+                    .createBy(dynamic.getCreateBy())
+                    .userVO(userVO)
+                    .children(new ArrayList<>())
+                    .build();
+
+            //查询当前动态的所有回复  封装children
+            List<DynamicVO> children = dynamicMapper.selectDynamicChildren(dynamic.getId());
+            for (DynamicVO child : children){
+
+                //获取回复发布人信息 todo
+                //User dynamicuser= dynamicMapper.selectById(child.getUserId());
+                UserVO childrenuser = UserVO.builder()
+                        .userId(114514L)
+                        .nickname("doar")
+                        .img("扣1送地狱火.jpg")
+                        .build();
+                child.setUserVO(childrenuser);
+            }
+            dynamicVO.setChildren(children);
+            dynamicVOs.add(dynamicVO);
+        }
+        return dynamicVOs;
+    }
 
 }

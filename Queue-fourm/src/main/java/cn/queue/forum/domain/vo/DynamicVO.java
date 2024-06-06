@@ -26,6 +26,8 @@ public class DynamicVO {
     private Long pid;  //父动态id
     private Long targetId;  //回复人id
     private Long likes;  //点赞数
+    private Long type;  //类型
+    private Long topicId; //题目id
     private LocalDateTime createTime;  //创建时间
     private LocalDateTime updateTime;  //更新时间
     private Long createBy;  //创建人
