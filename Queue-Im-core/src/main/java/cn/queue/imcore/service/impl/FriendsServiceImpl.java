@@ -85,13 +85,24 @@ public class FriendsServiceImpl implements IFriendsService {
             return "已经成为好友，不需要再添加了";
         }
 
+        LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FriendsEntity::getFromId, fromId);
+        Long count = friendsDao.selectCount(queryWrapper);
+        if (count >= 500) {
+            return "好友数量已达上限";
+        }
+
         //判断是否已经申请过了
         LambdaQueryWrapper<AddRecordEntity> addQuery = new LambdaQueryWrapper<>();
         addQuery.eq(AddRecordEntity::getFromId, fromId).eq(AddRecordEntity::getToId, toId);
         AddRecordEntity recordEntity = applyDao.selectOne(addQuery);
         if (recordEntity != null && recordEntity.getStatus() == 1) {
             return "已经申请过了，等待验证中";
-        }else if(recordEntity != null && (recordEntity.getStatus() == 3 || recordEntity.getStatus() == 4)){
+        }else if(recordEntity != null && (recordEntity.getStatus() == 3)){
+            recordEntity.setStatus(1);
+            applyDao.updateById(recordEntity);
+            return "申请已发送";
+        }else if (recordEntity != null && recordEntity.getStatus() == 4){
             recordEntity.setStatus(1);
             applyDao.updateById(recordEntity);
             return "申请已发送";
@@ -160,10 +171,14 @@ public class FriendsServiceImpl implements IFriendsService {
         } else if (status == 3) {
             return "已拒绝";
         }
-
-        //判断之前是否有好友记录, 如果有只改变状态即可，没有则需将新的好友记录插入
         LambdaQueryWrapper<FriendsEntity> friendsQuery = new LambdaQueryWrapper<>();
-        friendsQuery.eq(FriendsEntity::getFromId, fromId).eq(FriendsEntity::getToId, toId);
+        friendsQuery.eq(FriendsEntity::getToId, toId);
+        Long count = friendsDao.selectCount(friendsQuery);
+        if (count >= 500) {
+            return "好友数量已达上限";
+        }
+        //判断之前是否有好友记录, 如果有只改变状态即可，没有则需将新的好友记录插入
+        friendsQuery.eq(FriendsEntity::getFromId, fromId);
         LambdaQueryWrapper<FriendsEntity> eq = new LambdaQueryWrapper<FriendsEntity>()
                 .eq(FriendsEntity::getFromId, toId).eq(FriendsEntity::getToId, fromId);
         FriendsEntity friends = friendsDao.selectOne(friendsQuery);
@@ -188,12 +203,15 @@ public class FriendsServiceImpl implements IFriendsService {
                     .build();
             friendsDao.insert(friendsEntity);
 
+            User byId = userFeign.getById(fromId);
+            System.out.println("========================" + byId);
+
             friendsEntity = FriendsEntity.builder()
                     .fromId(toId)
                     .toId(fromId)
                     .status(1)
                     .black(1)
-                    .remark(userFeign.getById(fromId).getUsername())
+                    .remark(byId.getUsername())
                     .createTime(new Date())
                     .build();
             friendsDao.insert(friendsEntity);
@@ -516,13 +534,32 @@ public class FriendsServiceImpl implements IFriendsService {
         //将friend表中的status改为2，black改为2
         LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FriendsEntity::getFromId, fromId).eq(FriendsEntity::getToId, toId);
+//        LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.eq(FriendsEntity::getFromId, toId).eq(FriendsEntity::getToId, fromId);
+
         FriendsEntity friends = friendsDao.selectOne(queryWrapper);
         if (!isFriend(fromId, toId)) {
             return "不是好友，删除失败";
         }
         friends.setStatus(2);
         friends.setBlack(2);
+        //friendsDao.delete(wrapper);
         friendsDao.update(friends, queryWrapper);
+
+        LambdaQueryWrapper<AddRecordEntity> fQueryWrapper = new LambdaQueryWrapper<>();
+        fQueryWrapper.eq(AddRecordEntity::getFromId, fromId).eq(AddRecordEntity::getToId, toId);
+        AddRecordEntity recordEntity = applyDao.selectOne(fQueryWrapper);
+        if (recordEntity == null){
+            LambdaQueryWrapper<AddRecordEntity> tQueryWrapper = new LambdaQueryWrapper<>();
+            tQueryWrapper.eq(AddRecordEntity::getToId, fromId).eq(AddRecordEntity::getFromId, toId);
+            recordEntity = applyDao.selectOne(tQueryWrapper);
+            recordEntity.setStatus(4);
+            applyDao.update(recordEntity, tQueryWrapper);
+        }else{
+            recordEntity.setStatus(4);
+            applyDao.update(recordEntity, fQueryWrapper);
+        }
+
         return "删除成功";
     }
 
