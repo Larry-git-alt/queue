@@ -1,5 +1,8 @@
 package cn.queue.online_judge.service.impl;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import cn.queue.common.domain.CommonResult;
 import cn.queue.common.exception.define.BizException;
 import cn.queue.common.util.HttpUtils;
 import cn.queue.online_judge.constant.ThreadConstant;
@@ -19,8 +22,8 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Random;
 
@@ -45,19 +48,9 @@ public class JudgeServiceImpl implements JudgeService {
     private ComRankMapper comRankMapper;
 
     @Override
-    public void normalJudge(QuestionPack questionPack) {
-        threadPoolUtils.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    toJudge(questionPack);
-                } catch (Exception e) {
-                    throw new BizException(500, ThreadConstant.JUDGER_ERROR);
-                }
-            }
-        });
+    public Answer normalJudge(QuestionPack questionPack) throws InterruptedException {
 
-
+        return toNorJudge(questionPack);
     }
 
     @Override
@@ -72,23 +65,31 @@ public class JudgeServiceImpl implements JudgeService {
                 }
             }
         });
+
+
     }
     @Override
     public DebugResult debug(DebugDTO debugDTO) {
         int i = new Random().nextInt(3);
 
-        String key = "judge0" + i;
+        String key = "judge0" + i + ":808" + i;
 
         String url = "http://" + key + "/debug";
 
-        DebugResult result = (DebugResult) HttpUtils.doPost(url, debugDTO);
+        JSONObject jsonObject = JSONUtil.parseObj(HttpUtils.doPost(url, debugDTO));
+        jsonObject = JSONUtil.parseObj(jsonObject.get("data"));
+
+        DebugResult result = DebugResult.builder()
+                .output(String.valueOf(jsonObject.get("output")))
+                .errorReason(String.valueOf(jsonObject.get("errorReason")))
+                .build();
 
         return result;
     }
 
 
 
-    public void toNorJudge(QuestionPack questionPack) throws InterruptedException {
+    public Answer toNorJudge(QuestionPack questionPack) throws InterruptedException {
         for (int i = 1; i <= 3; i ++ ) {
             String key = "judger0" + i;
             String status = stringRedisTemplate.opsForValue().get(key);
@@ -104,13 +105,30 @@ public class JudgeServiceImpl implements JudgeService {
                     i %= 3;
                     continue;
                 }
-                String url = "http://" + key + "/judge";
+                String url = "http://" + key + ":808" + i + "/judge";
+//                String url = "http://182.92.167.230:1001/judge";
+                JSONObject jsonObject = JSONUtil.parseObj(HttpUtils.doPost(url, questionPack));
+                jsonObject = JSONUtil.parseObj(jsonObject.get("data"));
 
-                Answer answer = (Answer) HttpUtils.doPost(url, questionPack);
+                System.out.println("json=>" + jsonObject.toString());
+
+                Answer answer = Answer.builder()
+                                            .pass((Integer) jsonObject.get("pass"))
+                                                .total((Integer) jsonObject.get("total"))
+                                                    .status((String) jsonObject.get("status"))
+                                                        .runtime((Integer) jsonObject.get("time"))
+                                                            .runspace((Integer) jsonObject.get("memory"))
+                                                                .reason(String.valueOf(jsonObject.getObj("reason", " ")))
+                                                                    .code(questionPack.getCode())
+                                                                        .build();
+
+                System.out.println("answer=>" + answer.toString());
                // answer.setSubmissionTime(LocalDateTime.now());
                 // TODO 改为动态用户
                 Long userId = 1L;
                 answer.setUserId(userId);
+                answer.setProId(questionPack.getQusId());
+                answer.setLanguage(questionPack.getLanguage());
                 Thread.sleep(500);
 
                 //如果全过
@@ -124,11 +142,14 @@ public class JudgeServiceImpl implements JudgeService {
 
                 //  持久化数据
                 answerService.create(answer);
-
+                Integer countEnd = Integer.parseInt(Objects.requireNonNull(stringRedisTemplate.opsForValue().get("FREE:" + key)));
+                stringRedisTemplate.opsForValue().set("FREE:" + key, String.valueOf(countEnd - 1));
                 stringRedisTemplate.opsForValue().set(key, ThreadConstant.FREE_STATUS);
-                return;
+                return answer;
+
             }
         }
+        return null;
     }
 
 
@@ -141,15 +162,33 @@ public class JudgeServiceImpl implements JudgeService {
                 i %= 3;
 
             } else if (status.equals(ThreadConstant.FREE_STATUS)) {
-                stringRedisTemplate.opsForValue().set(key, ThreadConstant.OCCUPIED_STATUS);
+                Integer count = Integer.parseInt(Objects.requireNonNull(stringRedisTemplate.opsForValue().get("FREE:" + key)));
+                if (count < ThreadConstant.THRESHOLD)
+                    stringRedisTemplate.opsForValue().set("FREE:" + key, String.valueOf(count + 1));
+                else {
+                    stringRedisTemplate.opsForValue().set(key, ThreadConstant.OCCUPIED_STATUS);
+                    i %= 3;
+                    continue;
+                }
 
-                String url = "http://" + key + "/judge";
+                String url = "http://" + key + ":808" + i + "/judge";
 
-                AssessmentPoints assessmentPoints = (AssessmentPoints) HttpUtils.doPost(url, questionPack);
+                JSONObject jsonObject = JSONUtil.parseObj(HttpUtils.doPost(url, questionPack));
+                jsonObject = JSONUtil.parseObj(jsonObject.get("data"));
+
+                AssessmentPoints assessmentPoints = AssessmentPoints.builder()
+                        .pass((Integer) jsonObject.get("pass"))
+                        .total((Integer) jsonObject.get("total"))
+                        .status((String) jsonObject.get("status"))
+                        .runtime((Integer) jsonObject.get("time"))
+                        .runspace((Integer) jsonObject.get("memory"))
+                        .language(questionPack.getLanguage())
+                        .build();
                 assessmentPoints.setComId(comId);
                 // TODO 改为动态用户
                 Long userId = 1L;
                 assessmentPoints.setUserId(userId);
+                assessmentPoints.setProId(questionPack.getQusId());
                 Thread.sleep(500);
 
                 int totalScore = commonService.judgeScore(comId,userId);
@@ -157,6 +196,7 @@ public class JudgeServiceImpl implements JudgeService {
                 ComRank comRank = comRankMapper.selectOne(lqw.eq(ComRank::getComId,comId).eq(ComRank::getUserId,userId));
                 comRank.setTotalScore(totalScore);
                 comRankMapper.update(comRank,lqw);
+
 
 
                 //  持久化数据

@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.queue.common.domain.CommonResult;
 import cn.queue.online_judge.dto.DebugDTO;
 import cn.queue.online_judge.dto.QusPackDTO;
+import cn.queue.online_judge.pojo.Answer;
 import cn.queue.online_judge.pojo.QuestionPack;
 import cn.queue.online_judge.service.JudgeService;
 import jakarta.annotation.Resource;
@@ -21,9 +22,8 @@ public class JudgeController {
     private JudgeService judgeService;
 
     @PostMapping("/normalJudge")
-    public CommonResult normalJudge(@RequestBody QuestionPack questionPack) {
-        judgeService.normalJudge(questionPack);
-        return CommonResult.success();
+    public CommonResult<Answer> normalJudge(@RequestBody QuestionPack questionPack) throws InterruptedException {
+        return CommonResult.success(judgeService.normalJudge(questionPack));
     }
 
     @PostMapping("/debug")

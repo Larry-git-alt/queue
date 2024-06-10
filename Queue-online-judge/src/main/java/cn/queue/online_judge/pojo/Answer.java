@@ -3,6 +3,7 @@ package cn.queue.online_judge.pojo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Answer {
     private Long id;//主键id
     private Long userId;//用户id
@@ -30,4 +32,5 @@ public class Answer {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;//更新时间
     private Integer deleted;//是否删除 0未删除 1删除
+    private String reason;
  }
