@@ -27,6 +27,8 @@ public class AddRecordEntity {
 
     private Integer status;
 
+    private String remark;
+
     private Date createTime;
 
     private Date updateTime;

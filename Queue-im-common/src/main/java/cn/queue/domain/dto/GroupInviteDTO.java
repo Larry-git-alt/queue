@@ -22,4 +22,9 @@ public class GroupInviteDTO {
      * 被邀请人列表
      */
     private List<Long> userIds;
+
+    /**
+     * 邀请人
+     */
+    private Long inviter_id;
 }
