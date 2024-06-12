@@ -1,24 +1,16 @@
 package cn.queue.imcore.handler.impl;
-import cn.hutool.json.JSONUtil;
 import cn.queue.cache.ChannelHandlerContextCache;
-import cn.queue.common.util.SnowUtil;
 import cn.queue.domain.entity.ImMsgEntity;
-import cn.queue.domain.event.BaseEvent;
-import cn.queue.domain.pack.AckReturn;
 import cn.queue.domain.pack.MessageReadContent;
 import cn.queue.domain.valueObj.TopicConstant;
 import cn.queue.imcore.handler.SimplyHandler;
+import cn.queue.imcore.publisher.AckPublish;
 import cn.queue.imcore.service.ConversationService;
 import cn.queue.imcore.service.IMessageService;
 import cn.queue.util.ImContextUtils;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import jakarta.annotation.Resource;
-import org.springframework.data.mapping.Association;
-import org.springframework.data.mapping.PersistentProperty;
-import org.springframework.data.mapping.SimpleAssociationHandler;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.scanner.Constant;
 
 /**
  * @author: Larry
@@ -32,9 +24,12 @@ public class AckMessageHandler implements SimplyHandler {
     private IMessageService messageService;
     @Resource
     private ConversationService conversationService;
+    @Resource
+    private AckPublish ackPublish;
     @Override
     public void handler(ChannelHandlerContext ctx, ImMsgEntity imMsg) {
         Long userId = ImContextUtils.getUserId(ctx);
+        //给对方发送ack消息
         if(userId!=null && ChannelHandlerContextCache.get(imMsg.getTargetId())!=null){
             sendMessageToUser(imMsg.getTargetId(),imMsg);
         }
@@ -45,8 +40,7 @@ public class AckMessageHandler implements SimplyHandler {
                 .conversationType(2)
                 .messageSequence(22)
                 .build();
-        //异步
-        conversationService.messageMarkRead(messageReadContent);
+        ackPublish.publish(TopicConstant.IMAGE_ACK_TOPIC,messageReadContent);
     }
     public static void sendMessageToUser(Long userId, Object message) {
         ChannelHandlerContext ctx = ChannelHandlerContextCache.get(userId);

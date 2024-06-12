@@ -1,6 +1,5 @@
 package cn.queue.imcore.handler.impl;
 
-import cn.hutool.json.JSONUtil;
 import cn.queue.cache.ChannelHandlerContextCache;
 import cn.queue.common.util.SnowUtil;
 import cn.queue.domain.entity.ImMsgEntity;
@@ -8,18 +7,15 @@ import cn.queue.domain.pack.MessageReadContent;
 import cn.queue.domain.valueObj.Constants;
 import cn.queue.domain.valueObj.TopicConstant;
 import cn.queue.imcore.handler.SimplyHandler;
+import cn.queue.imcore.publisher.AckPublish;
+import cn.queue.imcore.publisher.MessagePublisher;
 import cn.queue.imcore.service.ConversationService;
 import cn.queue.imcore.service.IMessageService;
 import cn.queue.util.ImContextUtils;
 import cn.queue.util.RedisSequence;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
-
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * @author: Larry
@@ -28,14 +24,16 @@ import java.time.format.DateTimeFormatter;
  */
 @Component
 public class UserMessageHandler implements SimplyHandler {
-//    @Resource
-//    private EventPublisher eventPublisher;
+    @Resource
+    private MessagePublisher messagePublisher;
     @Resource
     private IMessageService messageService;
     @Resource
     private ConversationService conversationService;
     @Resource
     private RedisSequence redisSequence;
+    @Resource
+    private AckPublish ackPublish;
 
     @Override
     public void handler(ChannelHandlerContext ctx, ImMsgEntity imMsg) {
@@ -55,17 +53,16 @@ public class UserMessageHandler implements SimplyHandler {
                     System.out.println(imMsg.getTargetId());
                     sendMessageToUser(imMsg.getTargetId(), imMsg);
                 }
-                //mq异步存储
                 MessageReadContent messageReadContent = MessageReadContent.builder()
-                        .messageSequence(imMsg.getSequence())
+                        .toId(imMsg.getTargetId().toString())
                         .conversationType(2)
                         .fromId(imMsg.getUserId().toString())
-                        .toId(imMsg.getTargetId().toString())
+                        .messageSequence(imMsg.getSequence())
                         .build();
-                //更新seq(俩会话？)
-                conversationService.messageMarkRead(messageReadContent);
-                //持久化到数据库和redis
-                messageService.addMessage(imMsg);
+                //mq异步存储
+                messagePublisher.publish(TopicConstant.IMAGE_ADD_TOPIC,imMsg);
+                //更改会话seq
+                ackPublish.publish(TopicConstant.IMAGE_ACK_TOPIC,messageReadContent);
 
     }
     public static void sendMessageToUser(Long userId, Object message) {

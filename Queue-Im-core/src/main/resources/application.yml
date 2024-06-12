@@ -14,12 +14,12 @@ spring:
       host: 127.0.0.1
       port: 6379
       database: 0
-      address: "127.0.0.1"
-      mode: "single"
-      timeout: 2000
-      poolMinIdle: 5
-      poolConnTimeout: 3000
-      poolSize: 10
+#      address: "127.0.0.1"
+#      mode: "single"
+#      timeout: 2000
+#      poolMinIdle: 5
+#      poolConnTimeout: 3000
+#      poolSize: 10
 
 
 

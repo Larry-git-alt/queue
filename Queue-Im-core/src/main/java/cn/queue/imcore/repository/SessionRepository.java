@@ -6,6 +6,7 @@ import cn.queue.domain.entity.GroupEntity;
 import cn.queue.domain.entity.ImConversationSetEntity;
 import cn.queue.domain.entity.ImMsgEntity;
 import cn.queue.domain.valueObj.CacheConstant;
+import cn.queue.domain.valueObj.ConversationTypeEnum;
 import cn.queue.domain.valueObj.ImMsgCodeEnum;
 import cn.queue.domain.vo.SessionVO;
 import cn.queue.imcore.cache.MessageCache;
@@ -63,7 +64,7 @@ public class SessionRepository {
                             .code(ImMsgCodeEnum.IM_GROUP_MSG.getCode())
                             .build();
                     ImMsgEntity lastMessage = messageCache.getLastMessage(getMessageDTO);
-                    Long count = 0L;
+                    Long count = conversationService.count(getMessageDTO.getUserId(),getMessageDTO.getTargetId(), ConversationTypeEnum.GROUP.getCode());
                     transformSession(groupEntity.getId(),getMessageDTO.getCode(),groupEntity.getGroupName(), groupEntity.getPhoto(),lastMessage.getContent(),lastMessage.getCreateTime(), sessionVOS,1,count);
                 }
         );
@@ -114,7 +115,7 @@ public class SessionRepository {
                             .code(ImMsgCodeEnum.IM_USER_MSG.getCode())
                             .build();
                     ImMsgEntity lastMessage = messageCache.getLastMessage(getMessageDTO);
-                    Long count = conversationService.count(getMessageDTO.getUserId(),getMessageDTO.getTargetId());
+                    Long count = conversationService.count(getMessageDTO.getUserId(),getMessageDTO.getTargetId(), ConversationTypeEnum.P2P.getCode());
                     String content = lastMessage !=null ? lastMessage.getContent() : null;
                     String time = lastMessage !=null ? lastMessage.getCreateTime() :null;
                     transformSession(friendsEntity.getToId(),getMessageDTO.getCode(), friendsEntity.getRemark(), friendsEntity.getPhoto(),content,time,sessionVOS,isOnline,count);

@@ -8,6 +8,8 @@ import cn.queue.domain.entity.ImMsgEntity;
 import cn.queue.domain.pack.MessageReadContent;
 import cn.queue.domain.valueObj.CacheConstant;
 import cn.queue.domain.valueObj.Constants;
+import cn.queue.domain.valueObj.ConversationTypeEnum;
+import cn.queue.domain.valueObj.ImMsgCodeEnum;
 import cn.queue.domain.vo.SessionVO;
 import cn.queue.imcore.dao.ImConversationSetMapper;
 import cn.queue.imcore.repository.SessionRepository;
@@ -18,6 +20,7 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,7 +39,7 @@ public class MessageController {
     private SessionRepository sessionRepository;
     @GetMapping("/getMessage")
     public List<ImMsgEntity> imMsgEntities(GetMessageDTO messageDTO){
-        System.out.println(messageDTO.toString());
+        System.err.println(messageDTO.toString());
         System.out.println(messageDTO.getPageNum());
         System.out.println(messageDTO.getPageSize());
         return messageService.getHistoryMessage(messageDTO);
@@ -70,6 +73,6 @@ public class MessageController {
                                             .conversationType(2)
                                                     .build();
         conversationService.messageMarkRead(messageReadContent);
-        System.err.println(conversationService.count(3333L,1111L));
+        System.err.println(conversationService.count(3333L,1111L, ConversationTypeEnum.P2P.getCode()));
     }
 }
