@@ -5,6 +5,7 @@ import cn.queue.domain.dto.AddRecordDTO;
 import cn.queue.domain.entity.FriendsEntity;
 import cn.queue.domain.vo.AddRecordVO;
 import cn.queue.domain.vo.FriendVO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
 
