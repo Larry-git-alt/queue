@@ -3,7 +3,7 @@ package cn.queue.video.domain.model;
 /**
  * 返回状态码
  * 
- * @author ruoyi
+ * @author queue
  */
 public class HttpStatus
 {

@@ -3,6 +3,7 @@ server:
   servlet:
     context-path: /im-core
 spring:
+
   datasource:
     url: jdbc:mysql://rm-bp18u477k42fziy09do.mysql.rds.aliyuncs.com:3306/im
     username: im
@@ -13,6 +14,16 @@ spring:
       host: 127.0.0.1
       port: 6379
       database: 0
+#      address: "127.0.0.1"
+#      mode: "single"
+#      timeout: 2000
+#      poolMinIdle: 5
+#      poolConnTimeout: 3000
+#      poolSize: 10
+
+
+
+
 mybatis-plus:
   # 实体扫描，多个package用逗号或者分号分隔
   typeAliasesPackage: cn.queue.**.domain

@@ -23,7 +23,7 @@ public class HeartRepository {
     public void removeExpireRecord(Long userId) {
         String key = cacheKeyPrefix + ":" + userId % 1000;
         redisUtil.removeExpireRecord(key, ImConstants.DEFAULT_HEART_BEAT_GAP);
-        System.out.println(userId+"已经下线");
+
     }
 
 

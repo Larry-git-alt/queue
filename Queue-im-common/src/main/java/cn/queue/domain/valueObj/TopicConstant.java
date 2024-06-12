@@ -7,4 +7,5 @@ package cn.queue.domain.valueObj;
  */
 public class TopicConstant {
     public static final String IMAGE_ADD_TOPIC ="im-group";
+    public static final String IMAGE_ACK_TOPIC ="im-ack";
 }
