@@ -40,10 +40,10 @@ public class ImHandlerFactoryImpl implements ImHandlerFactory, InitializingBean 
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
         simplyHandlerMap.put(ImMsgCodeEnum.IM_USER_MSG.getCode(),applicationContext.getBean(UserMessageHandler.class));
         simplyHandlerMap.put(ImMsgCodeEnum.IM_HEARTBEAT_MSG.getCode(), applicationContext.getBean(HeartBeatHandler.class));
         simplyHandlerMap.put(ImMsgCodeEnum.IM_GROUP_MSG.getCode(),applicationContext.getBean(GroupMessageHandler.class));
+        simplyHandlerMap.put(ImMsgCodeEnum.IM_ACK_MSG.getCode(),applicationContext.getBean(AckMessageHandler.class));
     }
 
 

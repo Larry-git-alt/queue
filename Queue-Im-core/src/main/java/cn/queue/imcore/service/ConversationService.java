@@ -18,7 +18,7 @@ public interface ConversationService {
     CommonResult createConversation(CreateConversationReq req);
 
     //获取用户未读消息数量
-    Long count(Long fromId, Long toId);
+    Long count(Long fromId, Long toId,Integer type);
 
     //    /**
 //     * 标记用户已读消息情况，记录 Seq 消息偏序

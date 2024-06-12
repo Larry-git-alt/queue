@@ -53,11 +53,13 @@ public class MessageCache {
         long total = 100L;
         long start = (getMessageDTO.getPageNum() - 1) * getMessageDTO.getPageSize();
         long end = Math.min(start + getMessageDTO.getPageSize() - 1, total - 1); // 使用 total - 1
+        System.err.println(start+"==="+end);
         return redisTemplate.opsForList().range(baseKey,start,end);
     }
     //获得会话中最后一条消息
     public ImMsgEntity getLastMessage(GetMessageDTO getMessageDTO) {
         String baseKey = determineBaseKey(getMessageDTO); // 假设这是确定baseKey的方法
+        System.err.println(baseKey);
         if (baseKey == null) {
             // 处理错误情况，例如返回null或抛出异常
             return null;
