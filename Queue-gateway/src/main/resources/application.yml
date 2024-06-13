@@ -24,6 +24,10 @@ spring:
           uri: http://localhost:9001
           predicates:
             - Path=/video/**
+        - id: file
+          uri: http://localhost:6000
+          predicates:
+            - Path=/file/**
       globalcors:
         cors-configurations:
           '[/**]':
