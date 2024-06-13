@@ -26,5 +26,5 @@ public class GroupInviteDTO {
     /**
      * 邀请人
      */
-    private Long inviter_id;
+    private Long inviterId;
 }
