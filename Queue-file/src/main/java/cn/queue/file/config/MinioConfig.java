@@ -1,6 +1,8 @@
 package cn.queue.file.config;
 
+import cn.queue.file.utils.MinIOUtils;
 import io.minio.MinioClient;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "minio")
+@Data
 public class MinioConfig
 {
     /**
@@ -34,50 +37,23 @@ public class MinioConfig
      */
     private String bucketName;
 
-    public String getUrl()
-    {
-        return url;
-    }
+    private Integer imgSize;
 
-    public void setUrl(String url)
-    {
-        this.url = url;
-    }
+    private Integer fileSize;
 
-    public String getAccessKey()
-    {
-        return accessKey;
-    }
 
-    public void setAccessKey(String accessKey)
-    {
-        this.accessKey = accessKey;
-    }
-
-    public String getSecretKey()
-    {
-        return secretKey;
-    }
-
-    public void setSecretKey(String secretKey)
-    {
-        this.secretKey = secretKey;
-    }
-
-    public String getBucketName()
-    {
-        return bucketName;
-    }
-
-    public void setBucketName(String bucketName)
-    {
-        this.bucketName = bucketName;
+    @Bean
+    public MinioClient minioClient() {
+        return MinioClient.builder()
+                .endpoint(url)
+                .credentials(accessKey, secretKey)
+                .build();
     }
 
     @Bean
-    public MinioClient getMinioClient()
-    {
-        return MinioClient.builder().endpoint(url).credentials(accessKey, secretKey).build();
+    public MinIOUtils creatMinioClient() {
+        return new MinIOUtils(url, bucketName, accessKey, secretKey, imgSize, fileSize);
     }
+
 
 }

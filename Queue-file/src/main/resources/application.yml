@@ -3,6 +3,10 @@ server:
   servlet:
     context-path: /file
 spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
   datasource:
     url: jdbc:mysql://rm-bp18u477k42fziy09do.mysql.rds.aliyuncs.com:3306/${table_name}?serverTimezone=GMT%2B8
     username: online_judge
@@ -20,3 +24,11 @@ logging:
       queue:
         batch:
           mapper: trace
+
+minio:
+  url: http://182.92.167.230:9090 #Minio服务所在地址
+  bucketName: queue #存储桶名称
+  accessKey: minioadmin #访问的key
+  secretKey: minioadmin #访问的秘钥
+  imgSize: 1024 # 图片大小限制，单位：m
+  fileSize: 1024 # 文件大小限制，单位：m

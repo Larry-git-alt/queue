@@ -1,6 +1,7 @@
-package cn.queue.file.service;
+package cn.queue.file.service.impl;
 
 import cn.queue.file.config.MinioConfig;
+import cn.queue.file.service.ISysFileService;
 import cn.queue.file.utils.FileUploadUtils;
 import com.alibaba.nacos.common.utils.IoUtils;
 
