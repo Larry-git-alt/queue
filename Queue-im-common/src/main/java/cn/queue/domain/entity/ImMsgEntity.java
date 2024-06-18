@@ -33,13 +33,16 @@ public class ImMsgEntity{
     private String fileType;
 //    消息序列号
     private Long sequence;
-//    //测试数据
+    //测试数据
 //    {
-//            "userId": 33,
-//            "targetId": 22,
+//
+//            "userId": 3333,
+//            "targetId": 1111,
 //            "content": "Hello, this is a test message.",
-//            "code": 1003,
+//            "code": 1001,
 //            "fileType": "text",
+//            "sequence": 10
+//
 //    }
 
 }

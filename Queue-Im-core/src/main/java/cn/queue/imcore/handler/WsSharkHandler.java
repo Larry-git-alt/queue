@@ -47,7 +47,7 @@ public class WsSharkHandler extends ChannelInboundHandlerAdapter {
     private static Logger logger = LoggerFactory.getLogger(WsSharkHandler.class);
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws InterruptedException {
         //握手接入ws
         if (msg instanceof FullHttpRequest) {
             handleHttpRequest(ctx, ((FullHttpRequest) msg));
@@ -63,7 +63,7 @@ public class WsSharkHandler extends ChannelInboundHandlerAdapter {
         ctx.fireChannelRead(msg);
     }
 
-    private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest msg) {
+    private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest msg) throws InterruptedException {
         String webSocketUrl = "ws://" + serverIp + ":" + port;
         // 构造握手响应返回
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(webSocketUrl, null, false);
@@ -81,14 +81,15 @@ public class WsSharkHandler extends ChannelInboundHandlerAdapter {
             ImContextUtils.setUserId(ctx,id);
             ChannelHandlerContextCache.put(id,ctx);
             System.out.println(ChannelHandlerContextCache.get(id));
-//            this.OnlineNotice(id);
         //建立ws的握手连接
         webSocketServerHandshaker = wsFactory.newHandshaker(msg);
         if (webSocketServerHandshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
             return;
         }
+        System.out.println("test1");
         ChannelFuture channelFuture = webSocketServerHandshaker.handshake(ctx.channel(), msg);
+        System.out.println("test2");
 
     }
 

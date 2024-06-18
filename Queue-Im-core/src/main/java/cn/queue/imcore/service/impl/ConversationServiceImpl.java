@@ -52,10 +52,10 @@ public class ConversationServiceImpl implements ConversationService {
     }
     @Override
      //获取当前会话未读消息数量
-    public Long count(Long fromId, Long toId){
+    public Long count(Long fromId, Long toId,Integer type){
 
         String conversationId = ConversationService.convertConversationId(
-                2, fromId.toString(), toId.toString());
+                type, fromId.toString(), toId.toString());
         long seq = redisSequence.doGetSeq(conversationId+
                 Constants.SeqConstants.ConversationSeq);
         long readSeq = userSequenceRepository.getUserSeq(fromId.toString(),conversationId);
