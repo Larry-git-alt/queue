@@ -23,7 +23,7 @@ public interface IFriendsService  {
 
     boolean isFriend(Long fromId, Long toId);
 
-    List<AddRecordVO> getApplyList(Long id);
+    List<AddRecordVO> getApplyList(Long id, Integer pageSize, Integer pageNum);
 
     String addClazz(Long id, String clazzName);
 

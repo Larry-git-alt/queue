@@ -278,8 +278,7 @@ public class FriendsServiceImpl implements IFriendsService {
      * @return
      */
     @Override
-    public List<AddRecordVO> getApplyList(Long id) {
-
+    public List<AddRecordVO> getApplyList(Long id, Integer pageSize, Integer pageNum) {
         //判断用户是否存在
         User user = userFeign.getById(id);
         if (user == null) {
@@ -292,53 +291,42 @@ public class FriendsServiceImpl implements IFriendsService {
             return range;
         }
 
+        Page<AddRecordEntity> page = new Page<>(pageNum, pageSize);
+
         log.info("没有缓存，查询数据库");
         //两种，一种是被申请，一种是申请
-        LambdaQueryWrapper<AddRecordEntity> toQueryWrapper = new LambdaQueryWrapper<>();
-        toQueryWrapper.eq(AddRecordEntity::getToId, id);
+        LambdaQueryWrapper<AddRecordEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(AddRecordEntity::getToId, id).or().eq(AddRecordEntity::getFromId, id);
 
-        List<AddRecordEntity> beList = applyDao.selectList(toQueryWrapper);
+        Page<AddRecordEntity> toPage = applyDao.selectPage(page, queryWrapper);
+
+        List<AddRecordEntity> list = toPage.getRecords();
         List<AddRecordVO> addRecordVOS = new ArrayList<>();
-        beList.forEach(addRecordEntity -> {
-            AddRecordVO addRecordVO = new AddRecordVO();
-            BeanUtil.copyProperties(addRecordEntity, addRecordVO);
-            User fromUser = userFeign.getById(addRecordEntity.getFromId());
-            addRecordVO.setPhoto(fromUser.getImg());
-            addRecordVO.setUpdateTime(new Date());
-            addRecordVO.setType(0);
-            addRecordVO.setUsername(fromUser.getUsername());
-            addRecordVOS.add(addRecordVO);
-            //放入redis缓存
-            //addListCache.addToApplyList(addRecordDTO, id);
-        });
-
-        LambdaQueryWrapper<AddRecordEntity> queryWrapper = new LambdaQueryWrapper<AddRecordEntity>()
-                .eq(AddRecordEntity::getFromId, id);
-        List<AddRecordEntity> list = applyDao.selectList(queryWrapper);
         list.forEach(addRecordEntity -> {
-            AddRecordVO addRecordVO = new AddRecordVO();
-            BeanUtil.copyProperties(addRecordEntity, addRecordVO);
-            User toUser = userFeign.getById(addRecordEntity.getToId());
-            //TODO:查不到user信息
-            log.info("~~~~~~~~~~~~~~~~~~~~~{}", addRecordEntity.getToId());
-            addRecordVO.setPhoto(toUser.getImg());
-            addRecordVO.setUpdateTime(new Date());
-            addRecordVO.setType(1);
-            addRecordVO.setUsername(toUser.getUsername());
+            AddRecordVO addRecordVO = EnTurnTOVO(addRecordEntity, id);
             addRecordVOS.add(addRecordVO);
-            //放入redis缓存
-            //addListCache.addToApplyList(addRecordDTO, id);
         });
-
 
         //根据时间排序
         List<AddRecordVO> collect = addRecordVOS.stream()
                 .sorted(Comparator.nullsLast(Comparator.comparing(AddRecordVO::getCreateTime)))
                 .collect(Collectors.toList());
-//        collect.forEach(addDTO->{
-//            addListCache.addToApplyList(addDTO, id);
-//        });
+
         return collect;
+    }
+
+    private AddRecordVO EnTurnTOVO(AddRecordEntity addRecordEntity, Long id) {
+
+        AddRecordVO addRecordVO = new AddRecordVO();
+        BeanUtil.copyProperties(addRecordEntity, addRecordVO);
+        User user = userFeign.getById(addRecordEntity.getFromId());
+        //TODO: 查不到用户信息
+        addRecordVO.setPhoto(user.getImg());
+        addRecordVO.setUpdateTime(new Date());
+        addRecordVO.setType(addRecordEntity.getToId().equals(id) ? 0 : 1);
+        addRecordVO.setUsername(user.getUsername());
+        return addRecordVO;
+
     }
 
 
@@ -389,6 +377,7 @@ public class FriendsServiceImpl implements IFriendsService {
         LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FriendsEntity::getFromId, id).eq(FriendsEntity::getClazzId, clazzId);
         List<FriendsEntity> friendsEntities = friendsDao.selectList(queryWrapper);
+
         friendsEntities.forEach(friendsEntity -> {
             friendsEntity.setClazzId(0L);
             LambdaQueryWrapper<FriendsEntity> wrapper = new LambdaQueryWrapper<>();
@@ -472,14 +461,14 @@ public class FriendsServiceImpl implements IFriendsService {
     @Override
     public List<FriendVO> queryPageFriend(Long id, Integer pageSize, Integer pageNum) {
         // 创建分页参数对象
-        Page<FriendsEntity> page = new Page<>(pageSize,pageNum);
+        Page<FriendsEntity> page = new Page<>(pageNum,pageSize);
 
         // 使用分页参数执行查询
         LambdaQueryWrapper<FriendsEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FriendsEntity::getFromId, id)
                 .orderByAsc(FriendsEntity::getRemark);
         Page<FriendsEntity> friendsPage = friendsDao.selectPage(page, queryWrapper);
-
+        System.out.println(friendsPage.toString());
         // 转换数据
         List<FriendVO> friendsVOS = friendsPage.getRecords().stream()
                 .map(friendsEntity -> {
@@ -493,7 +482,7 @@ public class FriendsServiceImpl implements IFriendsService {
                 .collect(Collectors.toList());
 
         // 创建分页结果对象
-
+        log.info("result=>{}", friendsVOS);
         return friendsVOS;
     }
 
@@ -509,7 +498,7 @@ public class FriendsServiceImpl implements IFriendsService {
 
         //是否是好友
         boolean friend = isFriend(fromId, toId);
-        if ( !friend){
+        if (!friend){
             return "不是好友，无法设置备注";
         }
 

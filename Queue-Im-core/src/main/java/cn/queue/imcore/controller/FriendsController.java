@@ -51,8 +51,8 @@ public class FriendsController {
     }
 
     @GetMapping("/getApplyList")
-    public List<AddRecordVO> getApplyList(@RequestParam Long id){
-        return friendsService.getApplyList(id);
+    public List<AddRecordVO> getApplyList(@RequestParam Long id, @RequestParam Integer pageSize, @RequestParam Integer pageNum){
+        return friendsService.getApplyList(id, pageSize, pageNum);
     }
 
     @PostMapping("/setRemark")
